@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="date">@android:color/holo_orange_light</color>
+    <color name="seconds">@android:color/holo_red_light</color>
+    <color name="time">@android:color/white</color>
+</resources>
