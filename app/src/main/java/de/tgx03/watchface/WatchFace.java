@@ -47,9 +47,6 @@ public class WatchFace extends CanvasWatchFaceService {
         // The filter for receiving timezone changes
         private final IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
 
-        // Whether sizes and positions have been calculated
-        private boolean dimensionsCalculated = false;
-
         // Values for time position and size
         private float timeX;
         private float timeY;
@@ -116,6 +113,21 @@ public class WatchFace extends CanvasWatchFaceService {
             datePaintAmbient.setColor(Color.WHITE);
         }
 
+        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            int smaller = Math.min(width, height);
+            float timeSize = DEFAULT_TIME_SIZE * smaller;
+            timePaint.setTextSize(timeSize);
+            timePaintAmbient.setTextSize(timeSize);
+            float timeLength = timePaint.measureText("12:34");
+            timeX = (float) (width / 2) - (timeLength / 2);
+            timeY = (float) height / 2;
+            dateY = (float) (height / 2) + DEFAULT_DATE_VERTICAL_OFFSET * height;
+            secondsX = timeLength + timeX;
+            float dateSize = DEFAULT_DATE_SIZE * width;
+            datePaint.setTextSize(dateSize);
+            datePaintAmbient.setTextSize(dateSize);
+        }
+
         public void onPropertiesChanged (Bundle properties) {
             super.onPropertiesChanged(properties);
 
@@ -146,20 +158,6 @@ public class WatchFace extends CanvasWatchFaceService {
             String time = createTime();
             String date = createDate();
             String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
-            if (!dimensionsCalculated) {
-                float timeSize = DEFAULT_TIME_SIZE * bounds.right;
-                timePaint.setTextSize(timeSize);
-                timePaintAmbient.setTextSize(timeSize);
-                float timeLength = timePaint.measureText(time);
-                timeX = (float) (bounds.right / 2) - (timeLength / 2);
-                timeY = (float) bounds.bottom / 2;
-                dateY = (float) (bounds.bottom / 2) + DEFAULT_DATE_VERTICAL_OFFSET * bounds.bottom;
-                secondsX = timeLength + timeX;
-                float dateSize = DEFAULT_DATE_SIZE * bounds.right;
-                datePaint.setTextSize(dateSize);
-                datePaintAmbient.setTextSize(dateSize);
-                dimensionsCalculated = true;
-            }
             if(!date.equals(lastDate)) {
                 String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " |";
                 float dayLength = datePaint.measureText(day);
