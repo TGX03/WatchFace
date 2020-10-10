@@ -157,7 +157,6 @@ public class WatchFace extends CanvasWatchFaceService {
             calendar.setTimeInMillis(now);
             String time = createTime();
             String date = createDate();
-            String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
             if(!date.equals(lastDate)) {
                 String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " |";
                 float dayLength = datePaint.measureText(day);
@@ -170,6 +169,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
                 canvas.drawText(date, dateX, dateY, datePaintAmbient);
             } else {
+                String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
                 canvas.drawText(time, timeX, timeY, timePaint);
                 canvas.drawText(date, dateX, dateY, datePaint);
                 canvas.drawText(second, secondsX, timeY, secondsPaint);
