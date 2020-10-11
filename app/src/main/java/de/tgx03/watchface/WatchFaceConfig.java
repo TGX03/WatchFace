@@ -15,22 +15,16 @@ public class WatchFaceConfig extends Activity {
 
     private ComponentName watchFaceComponent;
 
-    private ProviderInfoRetriever infoRetriever;
-
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
 
         watchFaceComponent = new ComponentName(getApplicationContext(), WatchFace.class);
 
         setContentView(R.layout.settings_list);
-
-        infoRetriever = new ProviderInfoRetriever(getApplicationContext(), Executors.newCachedThreadPool());
-        infoRetriever.init();
     }
 
     protected void onDestroy() {
         super.onDestroy();
-        infoRetriever.release();
     }
 
     public void chooseBackground(View view) {
