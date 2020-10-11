@@ -132,6 +132,8 @@ public class WatchFace extends CanvasWatchFaceService {
 
         private final Handler updateTimeHandler = new UpdateTimeHandler(new WeakReference<>(this));
 
+        private boolean validBackground = false;
+
         // The coordinates for the large top complication
         private static final float TOP_COMPLICATION_LEFT = 0.2f;
         private static final float TOP_COMPLICATION_TOP = 0.1f;
@@ -260,7 +262,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 lastDate = date;
             }
             canvas.drawRect(bounds, background);
-            if (!isInAmbientMode()) {
+            if (!isInAmbientMode() && validBackground) {
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
             if (isInAmbientMode()) {
@@ -288,6 +290,9 @@ public class WatchFace extends CanvasWatchFaceService {
 
         public void onComplicationDataUpdate(int complicationID, ComplicationData data) {
             complicationDrawables[complicationID].setComplicationData(data);
+            if (complicationID == BACKGROUND_COMPLICATION) {
+                validBackground = data.getType() == ComplicationData.TYPE_LARGE_IMAGE;
+            }
         }
 
         private String createTime() {
