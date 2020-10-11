@@ -16,7 +16,6 @@ import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.util.SparseArray;
 import android.view.SurfaceHolder;
 
 import java.lang.ref.WeakReference;
@@ -38,8 +37,8 @@ public class WatchFace extends CanvasWatchFaceService {
     private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE},
             {ComplicationData.TYPE_LONG_TEXT}};
 
-    private SparseArray<ComplicationData> complicationData;
-    private SparseArray<ComplicationDrawable> complicationDrawables;
+    private ComplicationData[] complicationData;
+    private ComplicationDrawable[] complicationDrawables;
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -176,10 +175,10 @@ public class WatchFace extends CanvasWatchFaceService {
             datePaintAmbient.setTextSize(dateSize);
 
             Rect backgroundComplication = new Rect(0, 0, width, height);
-            complicationDrawables.get(BACKGROUND_COMPLICATION).setBounds(backgroundComplication);
+            complicationDrawables[BACKGROUND_COMPLICATION].setBounds(backgroundComplication);
 
             Rect topComplication = new Rect((int) (TOP_COMPLICATION_LEFT * width), (int) (TOP_COMPLICATION_TOP * height), (int) (TOP_COMPLICATION_RIGHT * width), (int) (TOP_COMPLICATION_BOTTOM * height));
-            complicationDrawables.get(TOP_COMPLICATION).setBounds(topComplication);
+            complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
         }
 
         public void onPropertiesChanged (Bundle properties) {
@@ -202,8 +201,8 @@ public class WatchFace extends CanvasWatchFaceService {
 
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
-            for (byte i = 0; i < COMPLICATION_IDS.length; i++) {
-                complicationDrawables.get(i).setInAmbientMode(inAmbientMode);
+            for (ComplicationDrawable drawable : complicationDrawables) {
+                drawable.setInAmbientMode(inAmbientMode);
             }
             invalidate();
             updateTimer();
@@ -222,7 +221,7 @@ public class WatchFace extends CanvasWatchFaceService {
             }
             canvas.drawRect(bounds, background);
             if (!isInAmbientMode()) {
-                complicationDrawables.get(BACKGROUND_COMPLICATION).draw(canvas, now);
+                complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
             if (isInAmbientMode()) {
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
@@ -248,8 +247,8 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onComplicationDataUpdate(int complicationID, ComplicationData data) {
-            complicationData.put(complicationID, data);
-            complicationDrawables.get(complicationID).setComplicationData(data);
+            complicationData[complicationID] = data;
+            complicationDrawables[complicationID].setComplicationData(data);
         }
 
         private String createTime() {
@@ -302,23 +301,23 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void initializeComplications() {
-            complicationData = new SparseArray<>(COMPLICATION_IDS.length);
-            complicationDrawables = new SparseArray<>(COMPLICATION_IDS.length);
+            complicationData = new ComplicationData[COMPLICATION_IDS.length];
+            complicationDrawables = new ComplicationDrawable[COMPLICATION_IDS.length];
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
             background.setContext(getApplicationContext());
-            complicationDrawables.put(BACKGROUND_COMPLICATION, background);
+            complicationDrawables[BACKGROUND_COMPLICATION] = background;
 
             ComplicationDrawable top = (ComplicationDrawable) getDrawable(R.drawable.complication);
             top.setContext(getApplicationContext());
-            complicationDrawables.put(TOP_COMPLICATION, top);
+            complicationDrawables[TOP_COMPLICATION] = top;
 
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION);
         }
 
         private void drawComplications(Canvas canvas, long time) {
             for (byte i = 1; i < COMPLICATION_IDS.length; i++) {
-                complicationDrawables.get(i).draw(canvas, time);
+                complicationDrawables[i].draw(canvas, time);
             }
         }
     }
