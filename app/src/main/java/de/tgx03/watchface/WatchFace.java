@@ -180,7 +180,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
             datePaint = new Paint();
             datePaint.setColor(getResources().getColor(R.color.date, getTheme()));
-            datePaint.setTypeface(Typeface.DEFAULT_BOLD);
+            datePaint.setTypeface(Typeface.DEFAULT);
             datePaint.setAntiAlias(true);
 
             datePaintAmbient = new Paint(datePaint);
@@ -258,7 +258,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 lastDate = date;
             }
             canvas.drawRect(bounds, background);
-            if (!isInAmbientMode()) {
+            if (!isInAmbientMode() && complicationDrawables[BACKGROUND_COMPLICATION].) {
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
             if (isInAmbientMode()) {
