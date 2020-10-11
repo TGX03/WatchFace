@@ -252,9 +252,11 @@ public class WatchFace extends CanvasWatchFaceService {
             String time = createTime();
             String date = createDate();
             if(!date.equals(lastDate)) {
-                String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " |";
-                float dayLength = datePaint.measureText(day);
-                dateX = (float) (bounds.right / 2) - dayLength;
+                String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " ";
+                float lengthWODash = datePaint.measureText(day);
+                float lengthWDash = datePaint.measureText(day + "|");
+                float average = (lengthWDash + lengthWODash) / 2;
+                dateX = (float) (bounds.right / 2) - average;
                 lastDate = date;
             }
             canvas.drawRect(bounds, background);
