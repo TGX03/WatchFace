@@ -32,6 +32,16 @@ public class WatchFaceConfig extends Activity {
         launchComplicationHelperActivity(ComplicationID.TOP);
     }
 
+    public void chooseBottomComplication(View view) {
+        if (view.equals(findViewById(R.id.SelectMiddleComplication))) {
+            launchComplicationHelperActivity(ComplicationID.BOTTOM_MIDDLE);
+        } else if (view.equals(findViewById(R.id.SelectLeftComplication))) {
+            launchComplicationHelperActivity(ComplicationID.BOTTOM_LEFT);
+        } else if (view.equals(findViewById(R.id.SelectRightComplication))) {
+            launchComplicationHelperActivity(ComplicationID.BOTTOM_RIGHT);
+        }
+    }
+
     private void launchComplicationHelperActivity(ComplicationID id) {
         byte selectedComplication = WatchFace.getComplicationID(id);
 

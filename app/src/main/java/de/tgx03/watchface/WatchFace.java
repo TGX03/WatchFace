@@ -31,11 +31,24 @@ public class WatchFace extends CanvasWatchFaceService {
     // Complication IDs
     private static final byte BACKGROUND_COMPLICATION = 0;
     private static final byte TOP_COMPLICATION = 1;
+    private static final byte BOTTOM_LEFT_COMPLICATION = 2;
+    private static final byte BOTTOM_MIDDLE_COMPLICATION = 3;
+    private static final byte BOTTOM_RIGHT_COMPLICATION = 4;
 
-    private static final byte[] COMPLICATION_IDS = {BACKGROUND_COMPLICATION, TOP_COMPLICATION};
-
-    private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE},
-            {ComplicationData.TYPE_LONG_TEXT}};
+    private static final int[][] COMPLICATION_SUPPORTED_TYPES = {
+            // Background Complication
+            {ComplicationData.TYPE_LARGE_IMAGE},
+            // Big top complication
+            {ComplicationData.TYPE_LONG_TEXT,
+                    ComplicationData.TYPE_SHORT_TEXT,
+                    ComplicationData.TYPE_ICON,
+                    ComplicationData.TYPE_RANGED_VALUE,
+                    ComplicationData.TYPE_SMALL_IMAGE},
+            // Small bottom complications
+            {ComplicationData.TYPE_SHORT_TEXT,
+                    ComplicationData.TYPE_ICON,
+                    ComplicationData.TYPE_RANGED_VALUE,
+                    ComplicationData.TYPE_SMALL_IMAGE}};
 
     private ComplicationDrawable[] complicationDrawables;
 
@@ -55,6 +68,12 @@ public class WatchFace extends CanvasWatchFaceService {
                 return BACKGROUND_COMPLICATION;
             case TOP:
                 return TOP_COMPLICATION;
+            case BOTTOM_LEFT:
+                return BOTTOM_LEFT_COMPLICATION;
+            case BOTTOM_MIDDLE:
+                return BOTTOM_MIDDLE_COMPLICATION;
+            case BOTTOM_RIGHT:
+                return BOTTOM_RIGHT_COMPLICATION;
             default:
                 return -1;
         }
@@ -66,6 +85,10 @@ public class WatchFace extends CanvasWatchFaceService {
                 return COMPLICATION_SUPPORTED_TYPES[0];
             case TOP:
                 return COMPLICATION_SUPPORTED_TYPES[1];
+            case BOTTOM_LEFT:
+            case BOTTOM_RIGHT:
+            case BOTTOM_MIDDLE:
+                return COMPLICATION_SUPPORTED_TYPES[2];
             default:
                 return new int[0];
         }
@@ -109,10 +132,21 @@ public class WatchFace extends CanvasWatchFaceService {
 
         private final Handler updateTimeHandler = new UpdateTimeHandler(new WeakReference<>(this));
 
+        // The coordinates for the large top complication
         private static final float TOP_COMPLICATION_LEFT = 0.2f;
-        private static final float TOP_COMPLICATION_TOP = 0.125f;
+        private static final float TOP_COMPLICATION_TOP = 0.1f;
         private static final float TOP_COMPLICATION_RIGHT = 0.8f;
         private static final float TOP_COMPLICATION_BOTTOM = 0.25f;
+
+        // The coordinates for the smaller bottom complications
+        private static final float BOTTOM_COMPLICATIONS_TOP = 0.65f;
+        private static final float BOTTOM_COMPLICATIONS_BOTTOM = 0.85f;
+        private static final float BOTTOM_MIDDLE_COMPLICATION_LEFT = 0.4f;
+        private static final float BOTTOM_MIDDLE_COMPLICATION_RIGHT = 0.6f;
+        private static final float BOTTOM_LEFT_COMPLICATION_LEFT = 0.17f;
+        private static final float BOTTOM_LEFT_COMPLICATION_RIGHT = 0.37f;
+        private static final float BOTTOM_RIGHT_COMPLICATION_LEFT = 0.63f;
+        private static final float BOTTOM_RIGHT_COMPLICATION_RIGHT = 0.83f;
 
         private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -172,8 +206,17 @@ public class WatchFace extends CanvasWatchFaceService {
             Rect backgroundComplication = new Rect(0, 0, width, height);
             complicationDrawables[BACKGROUND_COMPLICATION].setBounds(backgroundComplication);
 
-            Rect topComplication = new Rect((int) (TOP_COMPLICATION_LEFT * width), (int) (TOP_COMPLICATION_TOP * height), (int) (TOP_COMPLICATION_RIGHT * width), (int) (TOP_COMPLICATION_BOTTOM * height));
+            Rect topComplication = new Rect(Math.round(TOP_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(TOP_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+
+            Rect middleComplication = new Rect(Math.round(BOTTOM_MIDDLE_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_MIDDLE_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
+
+            Rect leftComplication = new Rect(Math.round(BOTTOM_LEFT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_LEFT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
+
+            Rect rightComplication = new Rect(Math.round(BOTTOM_RIGHT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_RIGHT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
         }
 
         public void onPropertiesChanged (Bundle properties) {
@@ -295,7 +338,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void initializeComplications() {
-            complicationDrawables = new ComplicationDrawable[COMPLICATION_IDS.length];
+            complicationDrawables = new ComplicationDrawable[5];
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
             background.setContext(getApplicationContext());
@@ -305,11 +348,23 @@ public class WatchFace extends CanvasWatchFaceService {
             top.setContext(getApplicationContext());
             complicationDrawables[TOP_COMPLICATION] = top;
 
-            setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION);
+            ComplicationDrawable left = (ComplicationDrawable) getDrawable(R.drawable.complication);
+            ComplicationDrawable middle = (ComplicationDrawable) getDrawable(R.drawable.complication);
+            ComplicationDrawable right = (ComplicationDrawable) getDrawable(R.drawable.complication);
+
+            left.setContext(getApplicationContext());
+            middle.setContext(getApplicationContext());
+            right.setContext(getApplicationContext());
+
+            complicationDrawables[BOTTOM_LEFT_COMPLICATION] = left;
+            complicationDrawables[BOTTOM_MIDDLE_COMPLICATION] = middle;
+            complicationDrawables[BOTTOM_RIGHT_COMPLICATION] = right;
+
+            setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
 
         private void drawComplications(Canvas canvas, long time) {
-            for (byte i = 1; i < COMPLICATION_IDS.length; i++) {
+            for (byte i = 1; i < 5; i++) {
                 complicationDrawables[i].draw(canvas, time);
             }
         }
