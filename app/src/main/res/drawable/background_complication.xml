@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<drawable
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    class="android.support.wearable.complications.rendering.ComplicationDrawable"
+    app:backgroundColor="@android:color/transparent"
+    app:borderColor="@android:color/transparent">
+
+    <ambient
+        app:backgroundColor="@android:color/black"/>
+</drawable>

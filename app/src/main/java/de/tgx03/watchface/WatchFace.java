@@ -12,9 +12,13 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.util.SparseArray;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
@@ -26,6 +30,16 @@ public class WatchFace extends CanvasWatchFaceService {
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
 
+    // Complication IDs
+    private static final byte BACKGROUND_COMPLICATION = 0;
+
+    private static final byte[] COMPLICATION_IDS = {BACKGROUND_COMPLICATION};
+
+    private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE}};
+
+    private SparseArray<ComplicationData> complicationData;
+    private SparseArray<ComplicationDrawable> complicationDrawables;
+
     /**
      * Handler message id for updating the time periodically in interactive mode.
      */
@@ -34,6 +48,28 @@ public class WatchFace extends CanvasWatchFaceService {
     @Override
     public Engine onCreateEngine() {
         return new Engine();
+    }
+
+    protected static byte getComplicationID(ComplicationID id) {
+        switch (id) {
+            case BACKGROUND:
+                return BACKGROUND_COMPLICATION;
+            default:
+                return -1;
+        }
+    }
+
+    protected static byte[] getComplicationIDs() {
+        return COMPLICATION_IDS;
+    }
+
+    protected static int[] getSupportedComplications(ComplicationID id) {
+        switch (id) {
+            case BACKGROUND:
+                return COMPLICATION_SUPPORTED_TYPES[0];
+            default:
+                return new int[0];
+        }
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
@@ -111,6 +147,8 @@ public class WatchFace extends CanvasWatchFaceService {
 
             datePaintAmbient = new Paint(datePaint);
             datePaintAmbient.setColor(Color.WHITE);
+
+            initializeComplications();
         }
 
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -126,6 +164,9 @@ public class WatchFace extends CanvasWatchFaceService {
             float dateSize = DEFAULT_DATE_SIZE * width;
             datePaint.setTextSize(dateSize);
             datePaintAmbient.setTextSize(dateSize);
+
+            Rect backgroundComplication = new Rect(0, 0, width, height);
+            complicationDrawables.get(BACKGROUND_COMPLICATION).setBounds(backgroundComplication);
         }
 
         public void onPropertiesChanged (Bundle properties) {
@@ -148,6 +189,9 @@ public class WatchFace extends CanvasWatchFaceService {
 
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
+            for (byte i = 0; i < COMPLICATION_IDS.length; i++) {
+                complicationDrawables.get(i).setInAmbientMode(inAmbientMode);
+            }
             invalidate();
             updateTimer();
         }
@@ -163,8 +207,10 @@ public class WatchFace extends CanvasWatchFaceService {
                 dateX = (float) (bounds.right / 2) - dayLength;
                 lastDate = date;
             }
-
             canvas.drawRect(bounds, background);
+            if (!isInAmbientMode()) {
+                complicationDrawables.get(BACKGROUND_COMPLICATION).draw(canvas, now);
+            }
             if (isInAmbientMode()) {
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
                 canvas.drawText(date, dateX, dateY, datePaintAmbient);
@@ -185,6 +231,11 @@ public class WatchFace extends CanvasWatchFaceService {
             } else {
                 unregisterReceiver();
             }
+        }
+
+        public void onComplicationDataUpdate(int complicationID, ComplicationData data) {
+            complicationData.put(complicationID, data);
+            complicationDrawables.get(complicationID).setComplicationData(data);
         }
 
         private String createTime() {
@@ -234,6 +285,15 @@ public class WatchFace extends CanvasWatchFaceService {
 
         private boolean shouldTimerRun() {
             return isVisible() && !isInAmbientMode();
+        }
+
+        private void initializeComplications() {
+            complicationData = new SparseArray<>(COMPLICATION_IDS.length);
+            complicationDrawables = new SparseArray<>(COMPLICATION_IDS.length);
+            ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
+            background.setContext(getApplicationContext());
+            complicationDrawables.put(BACKGROUND_COMPLICATION, background);
+            setActiveComplications(BACKGROUND_COMPLICATION);
         }
     }
 
