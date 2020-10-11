@@ -4,10 +4,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
-import android.support.wearable.complications.ProviderInfoRetriever;
 import android.view.View;
-
-import java.util.concurrent.Executors;
 
 public class WatchFaceConfig extends Activity {
 
