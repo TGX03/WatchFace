@@ -37,7 +37,6 @@ public class WatchFace extends CanvasWatchFaceService {
     private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE},
             {ComplicationData.TYPE_LONG_TEXT}};
 
-    private ComplicationData[] complicationData;
     private ComplicationDrawable[] complicationDrawables;
 
     /**
@@ -59,10 +58,6 @@ public class WatchFace extends CanvasWatchFaceService {
             default:
                 return -1;
         }
-    }
-
-    protected static byte[] getComplicationIDs() {
-        return COMPLICATION_IDS;
     }
 
     protected static int[] getSupportedComplications(ComplicationID id) {
@@ -247,7 +242,6 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onComplicationDataUpdate(int complicationID, ComplicationData data) {
-            complicationData[complicationID] = data;
             complicationDrawables[complicationID].setComplicationData(data);
         }
 
@@ -301,7 +295,6 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void initializeComplications() {
-            complicationData = new ComplicationData[COMPLICATION_IDS.length];
             complicationDrawables = new ComplicationDrawable[COMPLICATION_IDS.length];
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
