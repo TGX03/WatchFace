@@ -28,6 +28,9 @@ public class WatchFaceConfig extends Activity {
         launchComplicationHelperActivity(ComplicationID.BACKGROUND);
     }
 
+    public void chooseTopComplication(View view) {
+        launchComplicationHelperActivity(ComplicationID.TOP);
+    }
 
     private void launchComplicationHelperActivity(ComplicationID id) {
         byte selectedComplication = WatchFace.getComplicationID(id);

@@ -31,10 +31,12 @@ public class WatchFace extends CanvasWatchFaceService {
 
     // Complication IDs
     private static final byte BACKGROUND_COMPLICATION = 0;
+    private static final byte TOP_COMPLICATION = 1;
 
-    private static final byte[] COMPLICATION_IDS = {BACKGROUND_COMPLICATION};
+    private static final byte[] COMPLICATION_IDS = {BACKGROUND_COMPLICATION, TOP_COMPLICATION};
 
-    private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE}};
+    private static final int[][] COMPLICATION_SUPPORTED_TYPES = {{ComplicationData.TYPE_LARGE_IMAGE},
+            {ComplicationData.TYPE_LONG_TEXT}};
 
     private SparseArray<ComplicationData> complicationData;
     private SparseArray<ComplicationDrawable> complicationDrawables;
@@ -53,6 +55,8 @@ public class WatchFace extends CanvasWatchFaceService {
         switch (id) {
             case BACKGROUND:
                 return BACKGROUND_COMPLICATION;
+            case TOP:
+                return TOP_COMPLICATION;
             default:
                 return -1;
         }
@@ -66,6 +70,8 @@ public class WatchFace extends CanvasWatchFaceService {
         switch (id) {
             case BACKGROUND:
                 return COMPLICATION_SUPPORTED_TYPES[0];
+            case TOP:
+                return COMPLICATION_SUPPORTED_TYPES[1];
             default:
                 return new int[0];
         }
@@ -108,6 +114,11 @@ public class WatchFace extends CanvasWatchFaceService {
         private final Calendar calendar = Calendar.getInstance();
 
         private final Handler updateTimeHandler = new UpdateTimeHandler(new WeakReference<>(this));
+
+        private static final float TOP_COMPLICATION_LEFT = 0.2f;
+        private static final float TOP_COMPLICATION_TOP = 0.125f;
+        private static final float TOP_COMPLICATION_RIGHT = 0.8f;
+        private static final float TOP_COMPLICATION_BOTTOM = 0.25f;
 
         private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -166,6 +177,9 @@ public class WatchFace extends CanvasWatchFaceService {
 
             Rect backgroundComplication = new Rect(0, 0, width, height);
             complicationDrawables.get(BACKGROUND_COMPLICATION).setBounds(backgroundComplication);
+
+            Rect topComplication = new Rect((int) (TOP_COMPLICATION_LEFT * width), (int) (TOP_COMPLICATION_TOP * height), (int) (TOP_COMPLICATION_RIGHT * width), (int) (TOP_COMPLICATION_BOTTOM * height));
+            complicationDrawables.get(TOP_COMPLICATION).setBounds(topComplication);
         }
 
         public void onPropertiesChanged (Bundle properties) {
@@ -219,6 +233,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 canvas.drawText(date, dateX, dateY, datePaint);
                 canvas.drawText(second, secondsX, timeY, secondsPaint);
             }
+            drawComplications(canvas, now);
         }
 
         public void onVisibilityChanged(boolean visible) {
@@ -289,10 +304,22 @@ public class WatchFace extends CanvasWatchFaceService {
         private void initializeComplications() {
             complicationData = new SparseArray<>(COMPLICATION_IDS.length);
             complicationDrawables = new SparseArray<>(COMPLICATION_IDS.length);
+
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
             background.setContext(getApplicationContext());
             complicationDrawables.put(BACKGROUND_COMPLICATION, background);
-            setActiveComplications(BACKGROUND_COMPLICATION);
+
+            ComplicationDrawable top = (ComplicationDrawable) getDrawable(R.drawable.complication);
+            top.setContext(getApplicationContext());
+            complicationDrawables.put(TOP_COMPLICATION, top);
+
+            setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION);
+        }
+
+        private void drawComplications(Canvas canvas, long time) {
+            for (byte i = 1; i < COMPLICATION_IDS.length; i++) {
+                complicationDrawables.get(i).draw(canvas, time);
+            }
         }
     }
 
