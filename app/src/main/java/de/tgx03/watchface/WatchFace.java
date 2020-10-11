@@ -258,7 +258,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 lastDate = date;
             }
             canvas.drawRect(bounds, background);
-            if (!isInAmbientMode() && complicationDrawables[BACKGROUND_COMPLICATION].) {
+            if (!isInAmbientMode()) {
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
             if (isInAmbientMode()) {
