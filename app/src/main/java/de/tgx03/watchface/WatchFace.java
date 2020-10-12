@@ -109,6 +109,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private float timeX;
         private float timeY;
         private static final float DEFAULT_TIME_SIZE = 0.3f;
+        private static final float DEFAULT_SECONDS_SIZE = 0.09f;
 
         // Values for seconds position and size
         private float secondsX;
@@ -177,7 +178,6 @@ public class WatchFace extends CanvasWatchFaceService {
             secondsPaint = new Paint();
             secondsPaint.setColor(getResources().getColor(R.color.seconds, getTheme()));
             secondsPaint.setTypeface(Typeface.DEFAULT);
-            secondsPaint.setTextSize(30);
             secondsPaint.setAntiAlias(true);
 
             datePaint = new Paint();
@@ -196,6 +196,7 @@ public class WatchFace extends CanvasWatchFaceService {
             float timeSize = DEFAULT_TIME_SIZE * smaller;
             timePaint.setTextSize(timeSize);
             timePaintAmbient.setTextSize(timeSize);
+            secondsPaint.setTextSize(DEFAULT_SECONDS_SIZE * smaller);
             float timeLength = timePaint.measureText("12:34");
             timeX = (float) (width / 2) - (timeLength / 2);
             timeY = (float) height / 2;
