@@ -262,7 +262,6 @@ public class WatchFace extends CanvasWatchFaceService {
             }
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setLowBitAmbient(lowBitAmbient);
-                drawable.setBurnInProtection(requiredBurnInProtection);
             }
         }
 
