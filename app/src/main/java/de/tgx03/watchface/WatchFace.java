@@ -16,6 +16,7 @@ import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.lang.ref.WeakReference;
@@ -24,6 +25,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class WatchFace extends CanvasWatchFaceService {
+
+    private static final String TAG = "WatchFace";
 
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
@@ -97,6 +100,7 @@ public class WatchFace extends CanvasWatchFaceService {
     }
 
     protected static void setComplicationsInAmbient(boolean enabled) {
+        Log.d(TAG, "Complications in ambient " + (enabled ? "enabled" : "disabled"));
         complicationsInAmbient = enabled;
     }
 
@@ -105,6 +109,8 @@ public class WatchFace extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
+
+        private static final String TAG = "WatchFace.Engine";
 
         // The device features
         private Boolean requiredBurnInProtection;
@@ -176,6 +182,7 @@ public class WatchFace extends CanvasWatchFaceService {
         };
 
         public void onCreate(SurfaceHolder holder) {
+            Log.d(TAG, "Initializing engine");
             super.onCreate(holder);
 
             filter.addAction(Intent.ACTION_LOCALE_CHANGED);
@@ -208,6 +215,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            Log.d(TAG, "Surface changed");
             int smaller = Math.min(width, height);
             float timeSize = DEFAULT_TIME_SIZE * smaller;
             timePaint.setTextSize(timeSize);
@@ -238,6 +246,7 @@ public class WatchFace extends CanvasWatchFaceService {
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
 
             if (requiredBurnInProtection != null && !requiredBurnInProtection) {
+                Log.d(TAG, "Clearing set Rectangles");
                 topComplication = null;
                 leftComplication = null;
                 middleComplication = null;
@@ -273,15 +282,18 @@ public class WatchFace extends CanvasWatchFaceService {
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setLowBitAmbient(lowBitAmbient);
             }
+            Log.d(TAG, "Properties changed. Burn in: " + requiredBurnInProtection.toString() + " Low Bit Ambient: " + lowBitAmbient);
         }
 
         public void onTimeTick() {
+            Log.d(TAG, "System Tick");
             super.onTimeTick();
             invalidate();
             updateTimer();
         }
 
         public void onAmbientModeChanged(boolean inAmbientMode) {
+            Log.d(TAG, "Ambient mode " + (inAmbientMode ? "enabled" : "disabled"));
             super.onAmbientModeChanged(inAmbientMode);
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setInAmbientMode(inAmbientMode);
@@ -305,16 +317,20 @@ public class WatchFace extends CanvasWatchFaceService {
             }
             canvas.drawRect(bounds, background);
             if (!isInAmbientMode() && validBackground) {
+                Log.d(TAG, "Drawing background complication");
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
             if (isInAmbientMode() && !requiredBurnInProtection) {
+                Log.d(TAG, "Drawing ambient, no burn in protection");
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
                 canvas.drawText(date, dateX, dateY, datePaintAmbient);
             } else if (isInAmbientMode()) {
+                Log.d(TAG, "Drawing ambient, with burn in protection");
                 randomizeCoordinates();
                 canvas.drawText(time, timeXBurnIn, timeY, timePaintAmbient);
                 canvas.drawText(date, dateXBurnIn, dateY, datePaintAmbient);
             } else {
+                Log.d(TAG, "Drawing active");
                 String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
                 canvas.drawText(time, timeX, timeY, timePaint);
                 canvas.drawText(date, dateX, dateY, datePaint);
@@ -326,6 +342,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onVisibilityChanged(boolean visible) {
+            Log.d(TAG, "Visibility changed: " + (visible ? "visible" : "invisible"));
             super.onVisibilityChanged(visible);
 
             if (visible) {
@@ -344,6 +361,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void randomizeCoordinates() {
+            Log.d(TAG, "Randomizing coordinates");
             int offset = (int) Math.round(Math.random() * 10);
             if (lastMovedRight) {
                 offset = -offset;
@@ -367,6 +385,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void restoreCoordinates() {
+            Log.d(TAG, "restoring Coordinates");
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
             complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
@@ -419,6 +438,7 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void initializeComplications() {
+            Log.d(TAG, "Initializing complications");
             complicationDrawables = new ComplicationDrawable[5];
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
@@ -452,6 +472,9 @@ public class WatchFace extends CanvasWatchFaceService {
     }
 
     private static class UpdateTimeHandler extends Handler {
+
+        private static final String TAG = "WatchFace.UpdateTimeHandler";
+
         private final WeakReference<Engine> engineReference;
 
         UpdateTimeHandler(WeakReference<Engine> engine) {
@@ -463,6 +486,7 @@ public class WatchFace extends CanvasWatchFaceService {
             Engine engine = engineReference.get();
             if (engine != null) {
                 if (message.what == MSG_UPDATE_TIME) {
+                    Log.d(TAG, "received time update message");
                     engine.invalidate();
                     if (engine.shouldTimerRun()) {
                         long timeMs = System.currentTimeMillis();

@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
 public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
+
+    private static final String TAG = "WatchFaceConfig";
 
     private static final short COMPLICATION_CONFIG_REQUEST_CODE = 1001;
 
@@ -17,6 +20,8 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
     private Switch complicationsInAmbient;
 
     protected void onCreate(Bundle savedInstance) {
+        Log.d(TAG, "Creating config activity");
+
         super.onCreate(savedInstance);
 
         watchFaceComponent = new ComponentName(getApplicationContext(), WatchFace.class);
@@ -29,17 +34,21 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "Destroyed config activity");
     }
 
     public void chooseBackground(View view) {
+        Log.d(TAG, "Choosing background complication");
         launchComplicationHelperActivity(ComplicationID.BACKGROUND);
     }
 
     public void chooseTopComplication(View view) {
+        Log.d(TAG, "Choosing top complication");
         launchComplicationHelperActivity(ComplicationID.TOP);
     }
 
     public void chooseBottomComplication(View view) {
+        Log.d(TAG, "Choosing a bottom complication");
         if (view.equals(findViewById(R.id.SelectMiddleComplication))) {
             launchComplicationHelperActivity(ComplicationID.BOTTOM_MIDDLE);
         } else if (view.equals(findViewById(R.id.SelectLeftComplication))) {
@@ -51,6 +60,7 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     private void launchComplicationHelperActivity(ComplicationID id) {
         byte selectedComplication = WatchFace.getComplicationID(id);
+        Log.d(TAG, "Launching complication chooser for complication " + selectedComplication);
 
         if (selectedComplication >= 0) {
             int[] supportedTypes = WatchFace.getSupportedComplications(id);
@@ -63,6 +73,7 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Log.d(TAG, "Ambient complications were changed");
         if (buttonView == complicationsInAmbient) {
             WatchFace.setComplicationsInAmbient(isChecked);
         }
