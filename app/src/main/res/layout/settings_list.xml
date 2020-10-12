@@ -19,7 +19,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="421dp">
 
                 <ImageView
                     android:id="@+id/settingspreview"
@@ -43,7 +43,7 @@
                     android:id="@+id/SelectMiddleComplication"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
+                    android:layout_above="@id/background_chooser"
                     android:layout_centerHorizontal="true"
                     android:background="@android:color/transparent"
                     android:onClick="chooseBottomComplication"
@@ -53,7 +53,7 @@
                     android:id="@+id/SelectLeftComplication"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/settingspreview"
+                    android:layout_above="@id/background_chooser"
                     android:layout_toLeftOf="@id/SelectMiddleComplication"
                     android:background="@android:color/transparent"
                     android:onClick="chooseBottomComplication"
@@ -63,21 +63,23 @@
                     android:id="@+id/SelectRightComplication"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/settingspreview"
+                    android:layout_above="@id/background_chooser"
                     android:layout_toRightOf="@id/SelectMiddleComplication"
                     android:background="@android:color/transparent"
                     android:onClick="chooseBottomComplication"
                     android:src="@drawable/add_complication" />
 
-            </RelativeLayout>
+                <Button
+                    android:id="@+id/background_chooser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:layout_alignBottom="@id/settingspreview"
+                    android:layout_centerHorizontal="true"
+                    android:backgroundTint="#000000"
+                    android:onClick="chooseBackground"
+                    android:text="Background" />
 
-            <Button
-                android:id="@+id/background_chooser"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#000000"
-                android:onClick="chooseBackground"
-                android:text="Background" />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>
