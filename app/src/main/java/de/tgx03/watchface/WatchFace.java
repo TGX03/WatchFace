@@ -390,7 +390,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
                         startActivity(permissionRequestIntent);
                     } else {
-                        Log.i(TAG, "No complication intent found");
+                        Log.i(TAG, "Complication didn't provide an intent");
                     }
                 }
             }
