@@ -231,6 +231,10 @@ public class WatchFace extends CanvasWatchFaceService {
                 timePaintAmbient.setAntiAlias(false);
                 datePaintAmbient.setAntiAlias(false);
             }
+            for (ComplicationDrawable drawable : complicationDrawables) {
+                drawable.setLowBitAmbient(lowBitAmbient);
+                drawable.setBurnInProtection(requiredBurnInProtection);
+            }
         }
 
         public void onTimeTick() {
