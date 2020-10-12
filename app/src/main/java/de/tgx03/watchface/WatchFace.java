@@ -98,7 +98,8 @@ public class WatchFace extends CanvasWatchFaceService {
 
         // The device features
         private boolean lowBitAmbient;
-        private boolean requiredBurnInProtection;
+        private Boolean requiredBurnInProtection;
+        private boolean lastMovedRight = false;
 
         // Whether this is currently registered for receiving timezone changes
         private boolean receiving;
@@ -108,6 +109,7 @@ public class WatchFace extends CanvasWatchFaceService {
         // Values for time position and size
         private float timeX;
         private float timeY;
+        private Float timeXBurnIn;
         private static final float DEFAULT_TIME_SIZE = 0.3f;
         private static final float DEFAULT_SECONDS_SIZE = 0.09f;
 
@@ -118,6 +120,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private String lastDate;
         private float dateX;
         private float dateY;
+        private Float dateXBurnIn;
         private static final float DEFAULT_DATE_VERTICAL_OFFSET = 0.09f;
         private static final float DEFAULT_DATE_SIZE = 0.07f;
 
@@ -140,6 +143,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private static final float TOP_COMPLICATION_TOP = 0.1f;
         private static final float TOP_COMPLICATION_RIGHT = 0.8f;
         private static final float TOP_COMPLICATION_BOTTOM = 0.25f;
+        private Rect topComplication;
 
         // The coordinates for the smaller bottom complications
         private static final float BOTTOM_COMPLICATIONS_TOP = 0.65f;
@@ -150,6 +154,9 @@ public class WatchFace extends CanvasWatchFaceService {
         private static final float BOTTOM_LEFT_COMPLICATION_RIGHT = 0.37f;
         private static final float BOTTOM_RIGHT_COMPLICATION_LEFT = 0.63f;
         private static final float BOTTOM_RIGHT_COMPLICATION_RIGHT = 0.83f;
+        private Rect leftComplication;
+        private Rect middleComplication;
+        private Rect rightComplication;
 
         private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -209,23 +216,44 @@ public class WatchFace extends CanvasWatchFaceService {
             Rect backgroundComplication = new Rect(0, 0, width, height);
             complicationDrawables[BACKGROUND_COMPLICATION].setBounds(backgroundComplication);
 
-            Rect topComplication = new Rect(Math.round(TOP_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(TOP_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
+            topComplication = new Rect(Math.round(TOP_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(TOP_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
 
-            Rect middleComplication = new Rect(Math.round(BOTTOM_MIDDLE_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_MIDDLE_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            middleComplication = new Rect(Math.round(BOTTOM_MIDDLE_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_MIDDLE_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
 
-            Rect leftComplication = new Rect(Math.round(BOTTOM_LEFT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_LEFT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            leftComplication = new Rect(Math.round(BOTTOM_LEFT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_LEFT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
             complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
 
-            Rect rightComplication = new Rect(Math.round(BOTTOM_RIGHT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_RIGHT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
+            rightComplication = new Rect(Math.round(BOTTOM_RIGHT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_RIGHT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
+
+            if (requiredBurnInProtection != null && !requiredBurnInProtection) {
+                topComplication = null;
+                leftComplication = null;
+                middleComplication = null;
+                rightComplication = null;
+            }
         }
 
         public void onPropertiesChanged (Bundle properties) {
             super.onPropertiesChanged(properties);
 
             requiredBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
+            if (!requiredBurnInProtection) {
+                if (dateXBurnIn != null || timeXBurnIn != null) {
+                    restoreCoordinates();
+                }
+                topComplication = null;
+                leftComplication = null;
+                middleComplication = null;
+                rightComplication = null;
+            } else if (topComplication == null || leftComplication == null || middleComplication == null || rightComplication == null) {
+                topComplication = complicationDrawables[TOP_COMPLICATION].getBounds();
+                leftComplication = complicationDrawables[BOTTOM_LEFT_COMPLICATION].getBounds();
+                middleComplication = complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].getBounds();
+                rightComplication = complicationDrawables[BOTTOM_RIGHT_COMPLICATION].getBounds();
+            }
 
             lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
             if (lowBitAmbient) {
@@ -270,9 +298,13 @@ public class WatchFace extends CanvasWatchFaceService {
             if (!isInAmbientMode() && validBackground) {
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
-            if (isInAmbientMode()) {
+            if (isInAmbientMode() && !requiredBurnInProtection) {
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
                 canvas.drawText(date, dateX, dateY, datePaintAmbient);
+            } else if (isInAmbientMode()) {
+                randomizeCoordinates();
+                canvas.drawText(time, timeXBurnIn, timeY, timePaintAmbient);
+                canvas.drawText(date, dateXBurnIn, dateY, datePaintAmbient);
             } else {
                 String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
                 canvas.drawText(time, timeX, timeY, timePaint);
@@ -298,6 +330,36 @@ public class WatchFace extends CanvasWatchFaceService {
             if (complicationID == BACKGROUND_COMPLICATION) {
                 validBackground = data.getType() == ComplicationData.TYPE_LARGE_IMAGE;
             }
+        }
+
+        private void randomizeCoordinates() {
+            int offset = (int) Math.round(Math.random() * 10);
+            if (lastMovedRight) {
+                offset = -offset;
+            }
+            Rect topComplication = new Rect(this.topComplication);
+            Rect leftComplication = new Rect(this.leftComplication);
+            Rect middleComplication = new Rect(this.middleComplication);
+            Rect rightComplication = new Rect(this.rightComplication);
+            topComplication.offset(offset, 0);
+            leftComplication.offset(offset, 0);
+            middleComplication.offset(offset, 0);
+            rightComplication.offset(offset, 0);
+            complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+            complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
+            complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
+            complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
+            lastMovedRight = !lastMovedRight;
+
+            timeXBurnIn = timeX + offset;
+            dateXBurnIn = dateX + offset;
+        }
+
+        private void restoreCoordinates() {
+            complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+            complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
+            complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
+            complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
         }
 
         private String createTime() {
