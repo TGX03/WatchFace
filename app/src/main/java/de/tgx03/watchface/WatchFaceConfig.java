@@ -5,12 +5,16 @@ import android.content.ComponentName;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
-public class WatchFaceConfig extends Activity {
+public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
 
     private static final short COMPLICATION_CONFIG_REQUEST_CODE = 1001;
 
     private ComponentName watchFaceComponent;
+
+    private Switch complicationsInAmbient;
 
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
@@ -18,6 +22,9 @@ public class WatchFaceConfig extends Activity {
         watchFaceComponent = new ComponentName(getApplicationContext(), WatchFace.class);
 
         setContentView(R.layout.settings_list);
+        complicationsInAmbient = findViewById(R.id.ComplicationsInAmbient);
+        complicationsInAmbient.setChecked(WatchFace.getComplicationsInAmbient());
+        complicationsInAmbient.setOnCheckedChangeListener(this);
     }
 
     protected void onDestroy() {
@@ -51,6 +58,13 @@ public class WatchFaceConfig extends Activity {
             startActivityForResult(ComplicationHelperActivity.createProviderChooserHelperIntent(
                     getApplicationContext(), watchFaceComponent, selectedComplication, supportedTypes
             ), COMPLICATION_CONFIG_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView == complicationsInAmbient) {
+            WatchFace.setComplicationsInAmbient(isChecked);
         }
     }
 }

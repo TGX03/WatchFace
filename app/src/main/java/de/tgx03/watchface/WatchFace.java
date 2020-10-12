@@ -28,6 +28,8 @@ public class WatchFace extends CanvasWatchFaceService {
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
 
+    private static boolean complicationsInAmbient = true;
+
     // Complication IDs
     private static final byte BACKGROUND_COMPLICATION = 0;
     private static final byte TOP_COMPLICATION = 1;
@@ -92,6 +94,14 @@ public class WatchFace extends CanvasWatchFaceService {
             default:
                 return new int[0];
         }
+    }
+
+    protected static void setComplicationsInAmbient(boolean enabled) {
+        complicationsInAmbient = enabled;
+    }
+
+    protected static boolean getComplicationsInAmbient() {
+        return complicationsInAmbient;
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
@@ -310,7 +320,9 @@ public class WatchFace extends CanvasWatchFaceService {
                 canvas.drawText(date, dateX, dateY, datePaint);
                 canvas.drawText(second, secondsX, timeY, secondsPaint);
             }
-            drawComplications(canvas, now);
+            if (!isInAmbientMode() || complicationsInAmbient) {
+                drawComplications(canvas, now);
+            }
         }
 
         public void onVisibilityChanged(boolean visible) {
