@@ -97,7 +97,6 @@ public class WatchFace extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
 
         // The device features
-        private boolean lowBitAmbient;
         private Boolean requiredBurnInProtection;
         private boolean lastMovedRight = false;
 
@@ -255,7 +254,8 @@ public class WatchFace extends CanvasWatchFaceService {
                 rightComplication = complicationDrawables[BOTTOM_RIGHT_COMPLICATION].getBounds();
             }
 
-            lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
+            // The device features
+            boolean lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
             if (lowBitAmbient) {
                 timePaintAmbient.setAntiAlias(false);
                 datePaintAmbient.setAntiAlias(false);
