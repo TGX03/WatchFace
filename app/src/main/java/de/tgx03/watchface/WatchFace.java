@@ -314,10 +314,6 @@ public class WatchFace extends CanvasWatchFaceService {
             return dayName + " | " + day + "/" + month + "/" + year;
         }
 
-        private String formatLeadingZeroes(String numbers) {
-            return String.format("%02d", numbers);
-        }
-
         private String formatLeadingZeroes(long numbers) {
             return String.format("%02d", numbers);
         }
