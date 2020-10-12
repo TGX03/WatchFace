@@ -1,6 +1,8 @@
 package de.tgx03.watchface;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.ComplicationHelperActivity;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
@@ -56,6 +59,7 @@ public class WatchFace extends CanvasWatchFaceService {
                     ComplicationData.TYPE_SMALL_IMAGE}};
 
     private ComplicationDrawable[] complicationDrawables;
+    private ComplicationData[] complicationData;
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -190,7 +194,7 @@ public class WatchFace extends CanvasWatchFaceService {
             background = new Paint();
             background.setColor(Color.BLACK);
 
-            setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAccentColor(Color.parseColor("#FBBC04")).build());
+            setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAccentColor(Color.parseColor("#FBBC04")).setAcceptsTapEvents(true).build());
             timePaint = new Paint();
             timePaint.setColor(getResources().getColor(R.color.time, getTheme()));
             timePaint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -355,8 +359,40 @@ public class WatchFace extends CanvasWatchFaceService {
 
         public void onComplicationDataUpdate(int complicationID, ComplicationData data) {
             complicationDrawables[complicationID].setComplicationData(data);
+            complicationData[complicationID] = data;
             if (complicationID == BACKGROUND_COMPLICATION) {
                 validBackground = data.getType() == ComplicationData.TYPE_LARGE_IMAGE;
+            }
+        }
+
+        public void onTapCommand(int tapType, int x, int y, long eventTime) {
+            Log.d(TAG, "Tap registered");
+            if (tapType == TAP_TYPE_TAP) {
+                byte id = getTappedComplicationsID(x, y);
+                if (id != -1) {
+                    PendingIntent action = complicationData[id].getTapAction();
+                    if (action != null) {
+                        try {
+                            action.send();
+                        } catch (PendingIntent.CanceledException e) {
+                            Log.e(TAG, "Sending intent for tap action failed", e);
+                        }
+                    } else if (complicationData[id].getType() == ComplicationData.TYPE_NO_PERMISSION) {
+                        // Watch face does not have permission to receive complication data, so launch
+                        // permission request.
+                        ComponentName componentName = new ComponentName(
+                                getApplicationContext(),
+                                WatchFace.class);
+
+                        Intent permissionRequestIntent =
+                                ComplicationHelperActivity.createPermissionRequestHelperIntent(
+                                        getApplicationContext(), componentName);
+
+                        startActivity(permissionRequestIntent);
+                    } else {
+                        Log.i(TAG, "No complication intent found");
+                    }
+                }
             }
         }
 
@@ -461,6 +497,8 @@ public class WatchFace extends CanvasWatchFaceService {
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION] = middle;
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION] = right;
 
+            complicationData = new ComplicationData[5];
+
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
 
@@ -468,6 +506,18 @@ public class WatchFace extends CanvasWatchFaceService {
             for (byte i = 1; i < 5; i++) {
                 complicationDrawables[i].draw(canvas, time);
             }
+        }
+
+        private byte getTappedComplicationsID(int x, int y) {
+            Log.d(TAG, "Finding complication at " + x + ";" + y);
+            for (byte i = 1; i < complicationDrawables.length; i++) {
+                ComplicationDrawable drawable = complicationDrawables[i];
+                if (drawable.getBounds().contains(x, y)) {
+                    return i;
+                }
+            }
+            Log.d(TAG, "No complication found");
+            return -1;
         }
     }
 
