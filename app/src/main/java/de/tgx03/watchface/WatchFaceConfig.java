@@ -2,11 +2,16 @@ package de.tgx03.watchface;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 
 public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
@@ -30,6 +35,33 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         complicationsInAmbient = findViewById(R.id.ComplicationsInAmbient);
         complicationsInAmbient.setChecked(WatchFace.getComplicationsInAmbient());
         complicationsInAmbient.setOnCheckedChangeListener(this);
+
+        try {
+            Log.d(TAG, "Getting watchface screenshot");
+            Bitmap watchFace = WatchFace.getEngine().screenshot();
+            ImageView image = findViewById(R.id.settingspreview);
+            image.setImageBitmap(watchFace);
+            boolean[] bounds = WatchFace.getEngine().complicationLocations();
+            Drawable complicationSet = getDrawable(R.drawable.added_complication);
+            if (bounds[0]) {
+                ImageButton topButton = findViewById(R.id.SelectTopComplication);
+                topButton.setImageDrawable(complicationSet);
+            }
+            if (bounds[1]) {
+                ImageButton leftButton = findViewById(R.id.SelectLeftComplication);
+                leftButton.setImageDrawable(complicationSet);
+            }
+            if (bounds[2]) {
+                ImageButton middleButton = findViewById(R.id.SelectMiddleComplication);
+                middleButton.setImageDrawable(complicationSet);
+            }
+            if (bounds[3]) {
+                ImageButton rightButton = findViewById(R.id.SelectRightComplication);
+                rightButton.setImageDrawable(complicationSet);
+            }
+        } catch (IllegalStateException e) {
+            Log.w(TAG, "Couldn't get watchface screenshot", e);
+        }
     }
 
     protected void onDestroy() {

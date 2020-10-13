@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -30,6 +31,8 @@ import java.util.TimeZone;
 public class WatchFace extends CanvasWatchFaceService {
 
     private static final String TAG = "WatchFace";
+
+    private static Engine engine;
 
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
@@ -68,7 +71,16 @@ public class WatchFace extends CanvasWatchFaceService {
 
     @Override
     public Engine onCreateEngine() {
-        return new Engine();
+        engine = new Engine();
+        return engine;
+    }
+
+    protected static Engine getEngine() {
+        if (engine != null) {
+            return engine;
+        } else {
+            throw new IllegalStateException("Currently no engine available");
+        }
     }
 
     protected static byte getComplicationID(ComplicationID id) {
@@ -112,7 +124,7 @@ public class WatchFace extends CanvasWatchFaceService {
         return complicationsInAmbient;
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    protected class Engine extends CanvasWatchFaceService.Engine {
 
         private static final String TAG = "WatchFace.Engine";
 
@@ -124,6 +136,9 @@ public class WatchFace extends CanvasWatchFaceService {
         private boolean receiving;
         // The filter for receiving timezone changes
         private final IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
+
+        private Integer screenWidth;
+        private Integer screenHeight;
 
         // Values for time position and size
         private float timeX;
@@ -219,6 +234,9 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            screenHeight = height;
+            screenWidth = width;
+
             Log.d(TAG, "Surface changed");
             int smaller = Math.min(width, height);
             float timeSize = DEFAULT_TIME_SIZE * smaller;
@@ -394,6 +412,27 @@ public class WatchFace extends CanvasWatchFaceService {
                     }
                 }
             }
+        }
+
+        protected Bitmap screenshot() {
+            Log.d(TAG, "Screenshot requested");
+            if (screenWidth == null || screenHeight == null) {
+                Log.d(TAG, "Screen size required for screenshot not available");
+                throw new IllegalStateException("WatchFace not fully initialized");
+            }
+            Bitmap bitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            Rect bounds = new Rect(0, 0, screenWidth, screenHeight);
+            this.onDraw(canvas, bounds);
+            return bitmap;
+        }
+
+        protected boolean[] complicationLocations() {
+            boolean[] rect = new boolean[complicationData.length - 1];
+            for (byte i = 1; i < complicationData.length; i++) {
+                rect[i - 1] = complicationData[i] != null && complicationData[i].getType() != ComplicationData.TYPE_NOT_CONFIGURED && complicationData[i].getType() != ComplicationData.TYPE_EMPTY;
+            }
+            return rect;
         }
 
         private void randomizeCoordinates() {

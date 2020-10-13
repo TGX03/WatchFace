@@ -57,6 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@id/background_chooser"
+                    android:layout_marginEnd="4dp"
                     android:layout_toLeftOf="@id/SelectMiddleComplication"
                     android:background="@android:color/transparent"
                     android:onClick="chooseBottomComplication"
@@ -67,6 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@id/background_chooser"
+                    android:layout_marginStart="4dp"
                     android:layout_toRightOf="@id/SelectMiddleComplication"
                     android:background="@android:color/transparent"
                     android:onClick="chooseBottomComplication"
@@ -78,7 +80,8 @@
                     android:layout_height="38dp"
                     android:layout_alignBottom="@id/settingspreview"
                     android:layout_centerHorizontal="true"
-                    android:backgroundTint="#000000"
+                    android:layout_marginBottom="-7dp"
+                    android:backgroundTint="@android:color/transparent"
                     android:onClick="chooseBackground"
                     android:text="Background" />
 
