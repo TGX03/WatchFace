@@ -475,7 +475,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
         private String createDate() {
             String day = formatLeadingZeroes(calendar.get(Calendar.DAY_OF_MONTH));
-            String month = formatLeadingZeroes(calendar.get(Calendar.MONTH));
+            String month = formatLeadingZeroes(calendar.get(Calendar.MONTH) + 1);
             String year = String.valueOf(calendar.get(Calendar.YEAR));
             String dayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
             return dayName + " | " + day + "/" + month + "/" + year;
