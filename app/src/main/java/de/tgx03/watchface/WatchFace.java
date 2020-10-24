@@ -295,7 +295,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 rightComplication = complicationDrawables[BOTTOM_RIGHT_COMPLICATION].getBounds();
             }
 
-            // The device features
+            // Whether this device uses low bit ambient mode
             boolean lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
             if (lowBitAmbient) {
                 timePaintAmbient.setAntiAlias(false);
