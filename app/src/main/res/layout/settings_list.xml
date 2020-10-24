@@ -83,7 +83,7 @@
                     android:layout_marginBottom="-7dp"
                     android:backgroundTint="@android:color/transparent"
                     android:onClick="chooseBackground"
-                    android:text="Background" />
+                    android:text="@string/background" />
 
             </RelativeLayout>
 
@@ -94,7 +94,7 @@
                 android:layout_gravity="center_horizontal"
                 android:scaleX="0.8"
                 android:scaleY="0.85"
-                android:text="Complications in ambient" />
+                android:text="@string/complicationsAmbient" />
 
         </LinearLayout>
     </ScrollView>
