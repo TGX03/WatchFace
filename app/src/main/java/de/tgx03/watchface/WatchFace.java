@@ -286,15 +286,15 @@ public class WatchFace extends CanvasWatchFaceService {
             super.onPropertiesChanged(properties);
 
             requiredBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-            if (!requiredBurnInProtection) {
-                if (dateXBurnIn != null || timeXBurnIn != null) {
-                    restoreCoordinates();
-                }
+            // Clear complication bounds when burn in protection isn't required but they are set
+            if (!requiredBurnInProtection && (topComplication != null || leftComplication != null || middleComplication != null || rightComplication != null)) {
+                restoreCoordinates();
                 topComplication = null;
                 leftComplication = null;
                 middleComplication = null;
                 rightComplication = null;
-            } else if (topComplication == null || leftComplication == null || middleComplication == null || rightComplication == null) {
+                // Get complication bounds because they're needed for burn in protection
+            } else if (requiredBurnInProtection && (topComplication == null || leftComplication == null || middleComplication == null || rightComplication == null)) {
                 topComplication = complicationDrawables[TOP_COMPLICATION].getBounds();
                 leftComplication = complicationDrawables[BOTTOM_LEFT_COMPLICATION].getBounds();
                 middleComplication = complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].getBounds();
