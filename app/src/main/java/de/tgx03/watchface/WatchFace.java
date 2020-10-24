@@ -320,6 +320,9 @@ public class WatchFace extends CanvasWatchFaceService {
         public void onAmbientModeChanged(boolean inAmbientMode) {
             Log.d(TAG, "Ambient mode " + (inAmbientMode ? "enabled" : "disabled"));
             super.onAmbientModeChanged(inAmbientMode);
+            if (requiredBurnInProtection && !inAmbientMode) {
+                restoreCoordinates();
+            }
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setInAmbientMode(inAmbientMode);
             }
