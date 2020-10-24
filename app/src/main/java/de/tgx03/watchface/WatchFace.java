@@ -149,7 +149,7 @@ public class WatchFace extends CanvasWatchFaceService {
         // Values for time position and size
         private float timeX;
         private float timeY;
-        private Float timeXBurnIn;
+        private float timeXBurnIn;
         private static final float DEFAULT_TIME_SIZE = 0.3f;
         private static final float DEFAULT_SECONDS_SIZE = 0.09f;
 
@@ -160,7 +160,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private String lastDate;
         private float dateX;
         private float dateY;
-        private Float dateXBurnIn;
+        private float dateXBurnIn;
         private static final float DEFAULT_DATE_VERTICAL_OFFSET = 0.09f;
         private static final float DEFAULT_DATE_SIZE = 0.07f;
 
