@@ -209,7 +209,7 @@ public class WatchFace extends CanvasWatchFaceService {
             background = new Paint();
             background.setColor(Color.BLACK);
 
-            setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAccentColor(Color.parseColor("#FBBC04")).setAcceptsTapEvents(true).build());
+            setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAccentColor(getColor(R.color.date)).setAcceptsTapEvents(true).build());
             timePaint = new Paint();
             timePaint.setColor(getResources().getColor(R.color.time, getTheme()));
             timePaint.setTypeface(Typeface.DEFAULT_BOLD);
