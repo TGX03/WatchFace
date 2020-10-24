@@ -135,8 +135,8 @@ public class WatchFace extends CanvasWatchFaceService {
         private static final String TAG = "WatchFace.Engine";
 
         // The device features
-        private Boolean requiredBurnInProtection;
-        private boolean lastMovedRight = false;
+        private boolean requiredBurnInProtection = true;   // True by default to not damage screen before actual data provided
+        private boolean lastMovedRight = false; // Used to alternatingly move stuff right or left
 
         // Whether this is currently registered for receiving timezone changes
         private boolean receiving;
@@ -273,8 +273,8 @@ public class WatchFace extends CanvasWatchFaceService {
             rightComplication = new Rect(Math.round(BOTTOM_RIGHT_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_RIGHT_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
 
-            if (requiredBurnInProtection != null && !requiredBurnInProtection) {
-                Log.d(TAG, "Clearing set Rectangles");
+            if (!requiredBurnInProtection) {
+                Log.d(TAG, "Clearing set Rectangles because they're not needed without burn in protection");
                 topComplication = null;
                 leftComplication = null;
                 middleComplication = null;
@@ -313,7 +313,7 @@ public class WatchFace extends CanvasWatchFaceService {
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setLowBitAmbient(lowBitAmbient);
             }
-            Log.d(TAG, "Properties changed. Burn in: " + requiredBurnInProtection.toString() + " Low Bit Ambient: " + lowBitAmbient);
+            Log.d(TAG, "Properties changed. Burn in: " + requiredBurnInProtection + " Low Bit Ambient: " + lowBitAmbient);
         }
 
         public void onTimeTick() {
