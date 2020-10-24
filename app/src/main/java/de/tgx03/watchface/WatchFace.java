@@ -121,11 +121,19 @@ public class WatchFace extends CanvasWatchFaceService {
         }
     }
 
+    /**
+     * This method sets whether complications should be rendered in ambient mode
+     * @param enabled Whether complications shall be shown in ambient mode
+     */
     protected static void setComplicationsInAmbient(boolean enabled) {
         Log.d(TAG, "Complications in ambient " + (enabled ? "enabled" : "disabled"));
         complicationsInAmbient = enabled;
     }
 
+    /**
+     * Returns whether complications currently get rendered in ambient mode
+     * @return Whether complications are currently enabled in ambient mode
+     */
     protected static boolean getComplicationsInAmbient() {
         return complicationsInAmbient;
     }
@@ -261,6 +269,7 @@ public class WatchFace extends CanvasWatchFaceService {
             Rect backgroundComplication = new Rect(0, 0, width, height);
             complicationDrawables[BACKGROUND_COMPLICATION].setBounds(backgroundComplication);
 
+            Log.d(TAG, "Calculating complication bounds");
             topComplication = new Rect(Math.round(TOP_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(TOP_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
 
@@ -303,6 +312,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
             // Whether this device uses low bit ambient mode
             boolean lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
+            // Enable or disable anti alias for time and date depending on whether in low bit ambient
             if (lowBitAmbient) {
                 timePaintAmbient.setAntiAlias(false);
                 datePaintAmbient.setAntiAlias(false);
@@ -337,10 +347,12 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         public void onDraw(Canvas canvas, Rect bounds) {
+            // Get basic data to draw
             long now = System.currentTimeMillis();
             calendar.setTimeInMillis(now);
             String time = createTime();
             String date = createDate();
+            // Re-calculate the position of the date if it has changed since the last draw
             if(!date.equals(lastDate)) {
                 String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " ";
                 float lengthWODash = datePaint.measureText(day);
@@ -349,27 +361,33 @@ public class WatchFace extends CanvasWatchFaceService {
                 dateX = (float) (bounds.right / 2) - average;
                 lastDate = date;
             }
+            // Clear the background
             canvas.drawRect(bounds, background);
+            // Draw the background complication if not in ambient and one is set
             if (!isInAmbientMode() && validBackground) {
                 Log.d(TAG, "Drawing background complication");
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
             }
+            // Draw default ambient
             if (isInAmbientMode() && !requiredBurnInProtection) {
                 Log.d(TAG, "Drawing ambient, no burn in protection");
                 canvas.drawText(time, timeX, timeY, timePaintAmbient);
                 canvas.drawText(date, dateX, dateY, datePaintAmbient);
+                // Draw ambient with shifting coordinates
             } else if (isInAmbientMode()) {
                 Log.d(TAG, "Drawing ambient, with burn in protection");
                 randomizeCoordinates();
                 canvas.drawText(time, timeXBurnIn, timeY, timePaintAmbient);
                 canvas.drawText(date, dateXBurnIn, dateY, datePaintAmbient);
             } else {
+                // Draw active
                 Log.d(TAG, "Drawing active");
                 String second = formatLeadingZeroes(calendar.get(Calendar.SECOND));
                 canvas.drawText(time, timeX, timeY, timePaint);
                 canvas.drawText(date, dateX, dateY, datePaint);
                 canvas.drawText(second, secondsX, timeY, secondsPaint);
             }
+            // Draw complications
             if (!isInAmbientMode() || complicationsInAmbient) {
                 drawComplications(canvas, now);
             }
@@ -445,6 +463,11 @@ public class WatchFace extends CanvasWatchFaceService {
             return bitmap;
         }
 
+        /**
+         * Creates an array telling which complications are set and which aren't
+         * Gets used by the settings menu to determine which icon gets shown in that place
+         * @return Which complications are set
+         */
         protected boolean[] complicationLocations() {
             boolean[] rect = new boolean[complicationData.length - 1];
             for (byte i = 1; i < complicationData.length; i++) {
@@ -453,9 +476,15 @@ public class WatchFace extends CanvasWatchFaceService {
             return rect;
         }
 
+        /**
+         * Offsets the complications and date and time by a random offset
+         * The complications get directly offset
+         * For date and time it is necessary to use the corresponding burn in variable,
+         * the originals don't get changed
+         */
         private void randomizeCoordinates() {
-            Log.d(TAG, "Randomizing coordinates");
             int offset = (int) Math.round(Math.random() * 10);
+            Log.d(TAG, "Randomizing coordinates by " + offset);
             if (lastMovedRight) {
                 offset = -offset;
             }
@@ -477,6 +506,10 @@ public class WatchFace extends CanvasWatchFaceService {
             dateXBurnIn = dateX + offset;
         }
 
+        /**
+         * Restores the original coordinates for complications
+         * For date and time, simply don't use the offset variables
+         */
         private void restoreCoordinates() {
             Log.d(TAG, "restoring Coordinates");
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
@@ -485,12 +518,21 @@ public class WatchFace extends CanvasWatchFaceService {
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
         }
 
+        /**
+         * Creates a string of the current time in 24h format
+         * Because fuck AM/PM
+         * @return A string representing the time
+         */
         private String createTime() {
             String hour = formatLeadingZeroes(calendar.get(Calendar.HOUR_OF_DAY));
             String minute = formatLeadingZeroes(calendar.get(Calendar.MINUTE));
             return hour + ":" + minute;
         }
 
+        /**
+         * Creates the string to be shown as date consisting of the weekday, a stroke and the actual date
+         * @return A string of the current day and date
+         */
         private String createDate() {
             String day = formatLeadingZeroes(calendar.get(Calendar.DAY_OF_MONTH));
             String month = formatLeadingZeroes(calendar.get(Calendar.MONTH) + 1);
@@ -499,10 +541,18 @@ public class WatchFace extends CanvasWatchFaceService {
             return dayName + " | " + day + "/" + month + "/" + year;
         }
 
+        /**
+         * Creates a string of a numerical value with 2 leading zeroes
+         * @param numbers The value to format
+         * @return A string formatted to 2 leading zeroes
+         */
         private String formatLeadingZeroes(long numbers) {
             return String.format("%02d", numbers);
         }
 
+        /**
+         * Register this engine to receive timezone updates
+         */
         private void registerReceiver() {
             if (receiving) {
                 return;
@@ -511,6 +561,9 @@ public class WatchFace extends CanvasWatchFaceService {
             receiving = true;
         }
 
+        /**
+         * Unregister this engine from receiving timezone updates
+         */
         private void unregisterReceiver() {
             if (!receiving) {
                 return;
@@ -519,6 +572,9 @@ public class WatchFace extends CanvasWatchFaceService {
             receiving = false;
         }
 
+        /**
+         * Change whether this engine gets updated every second or only listens for the system tick every minute
+         */
         private void updateTimer() {
             updateTimeHandler.removeMessages(MSG_UPDATE_DISPLAY);
             if (shouldTimerRun()) {
@@ -530,6 +586,9 @@ public class WatchFace extends CanvasWatchFaceService {
             return isVisible() && !isInAmbientMode();
         }
 
+        /**
+         * Creates the complications and the array they get stored in
+         */
         private void initializeComplications() {
             Log.d(TAG, "Initializing complications");
             complicationDrawables = new ComplicationDrawable[5];
@@ -559,12 +618,24 @@ public class WatchFace extends CanvasWatchFaceService {
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
 
+        /**
+         * Draws the foreground complications on the provided canvas
+         * @param canvas The canvas the complications should be drawn on
+         * @param time The time the complications should use when drawing
+         */
         private void drawComplications(Canvas canvas, long time) {
             for (byte i = 1; i < 5; i++) {
                 complicationDrawables[i].draw(canvas, time);
             }
         }
 
+        /**
+         * Finds out which complication the used tapped on
+         * Ignores the background complication
+         * @param x The x coordinate of the tapped location
+         * @param y The y coordinate of the tapped location
+         * @return The ID of the tapped location or -1 if tapped on empty space
+         */
         private byte getTappedComplicationsID(int x, int y) {
             Log.d(TAG, "Finding complication at " + x + ";" + y);
             for (byte i = 1; i < complicationDrawables.length; i++) {
