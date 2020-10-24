@@ -300,6 +300,9 @@ public class WatchFace extends CanvasWatchFaceService {
             if (lowBitAmbient) {
                 timePaintAmbient.setAntiAlias(false);
                 datePaintAmbient.setAntiAlias(false);
+            } else {
+                timePaintAmbient.setAntiAlias(true);
+                datePaintAmbient.setAntiAlias(true);
             }
             for (ComplicationDrawable drawable : complicationDrawables) {
                 drawable.setLowBitAmbient(lowBitAmbient);
