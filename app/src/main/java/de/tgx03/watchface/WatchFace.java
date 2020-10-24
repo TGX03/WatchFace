@@ -67,7 +67,7 @@ public class WatchFace extends CanvasWatchFaceService {
     /**
      * Handler message id for updating the time periodically in interactive mode.
      */
-    private static final byte MSG_UPDATE_TIME = 0;
+    private static final byte MSG_UPDATE_DISPLAY = 0;
 
     @Override
     public Engine onCreateEngine() {
@@ -502,9 +502,9 @@ public class WatchFace extends CanvasWatchFaceService {
         }
 
         private void updateTimer() {
-            updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            updateTimeHandler.removeMessages(MSG_UPDATE_DISPLAY);
             if (shouldTimerRun()) {
-                updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                updateTimeHandler.sendEmptyMessage(MSG_UPDATE_DISPLAY);
             }
         }
 
@@ -574,14 +574,14 @@ public class WatchFace extends CanvasWatchFaceService {
         public void handleMessage(Message message) {
             Engine engine = engineReference.get();
             if (engine != null) {
-                if (message.what == MSG_UPDATE_TIME) {
+                if (message.what == MSG_UPDATE_DISPLAY) {
                     Log.d(TAG, "received time update message");
                     engine.invalidate();
                     if (engine.shouldTimerRun()) {
                         long timeMs = System.currentTimeMillis();
                         long delayMs = INTERACTIVE_UPDATE_RATE_MS
                                 - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
-                        sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
+                        sendEmptyMessageDelayed(MSG_UPDATE_DISPLAY, delayMs);
                     }
                 }
             }
