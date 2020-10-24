@@ -75,7 +75,13 @@ public class WatchFace extends CanvasWatchFaceService {
         return engine;
     }
 
-    protected static Engine getEngine() {
+    /**
+     * Retrieves the last created engine. Only gets used for creating screenshots in the settings.
+     * Throws errors when no engine has been created. Only to be used in the package
+     * @return The last created engine
+     * @throws IllegalStateException Gets thrown when an engine hasn't yet been created
+     */
+    protected static Engine getEngine() throws IllegalStateException {
         if (engine != null) {
             return engine;
         } else {
@@ -420,7 +426,13 @@ public class WatchFace extends CanvasWatchFaceService {
             }
         }
 
-        protected Bitmap screenshot() {
+        /**
+         * Creates a screenshot of how the watch currently looks
+         * Gets used for showing a screenshot in the settings menu
+         * @return How the watch currently looks
+         * @throws IllegalStateException Gets thrown when the engine isn't fully initialized and therefore cannot produce a valid screenshot
+         */
+        protected Bitmap screenshot() throws IllegalStateException {
             Log.d(TAG, "Screenshot requested");
             if (screenWidth == null || screenHeight == null) {
                 Log.d(TAG, "Screen size required for screenshot not available");
