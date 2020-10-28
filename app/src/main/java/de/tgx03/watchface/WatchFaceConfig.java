@@ -3,7 +3,6 @@ package de.tgx03.watchface;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
