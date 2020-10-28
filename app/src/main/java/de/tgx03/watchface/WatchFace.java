@@ -143,6 +143,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private float timeX;
         private float timeY;
         private float timeXBurnIn;
+        private static final float DEFAULT_TIME_Y = 0.47f;
         private static final float DEFAULT_TIME_SIZE = 0.3f;
         private static final float DEFAULT_SECONDS_SIZE = 0.09f;
 
@@ -154,7 +155,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private float dateX;
         private float dateY;
         private float dateXBurnIn;
-        private static final float DEFAULT_DATE_VERTICAL_OFFSET = 0.09f;
+        private static final float DEFAULT_DATE_VERTICAL_OFFSET = 0.04f;
         private static final float DEFAULT_DATE_SIZE = 0.07f;
 
         // Styles for elements
@@ -176,24 +177,24 @@ public class WatchFace extends CanvasWatchFaceService {
         private static final float LARGE_COMPLICATION_RIGHT = 0.8f;
 
         // The coordinates for the large top complication
-        private static final float TOP_COMPLICATION_TOP = 0.1f;
-        private static final float TOP_COMPLICATION_BOTTOM = 0.25f;
+        private static final float TOP_COMPLICATION_TOP = 0.08f;
+        private static final float TOP_COMPLICATION_BOTTOM = 0.23f;
         private Rect topComplication;
 
         // The coordinates of the large bottom complication
-        private static final float BOTTOM_LARGE_COMPLICATION_TOP = 0.78f;
-        private static final float BOTTOM_LARGE_COMPLICATION_BOTTOM = 0.93f;
+        private static final float BOTTOM_LARGE_COMPLICATION_TOP = 0.77f;
+        private static final float BOTTOM_LARGE_COMPLICATION_BOTTOM = 0.92f;
         private Rect bottomLargeComplication;
 
         // The coordinates for the smaller bottom complications
-        private static final float BOTTOM_COMPLICATIONS_TOP = 0.615f;
-        private static final float BOTTOM_COMPLICATIONS_BOTTOM = 0.765f;
-        private static final float BOTTOM_MIDDLE_COMPLICATION_LEFT = 0.4f;
-        private static final float BOTTOM_MIDDLE_COMPLICATION_RIGHT = 0.6f;
-        private static final float BOTTOM_LEFT_COMPLICATION_LEFT = 0.17f;
-        private static final float BOTTOM_LEFT_COMPLICATION_RIGHT = 0.37f;
-        private static final float BOTTOM_RIGHT_COMPLICATION_LEFT = 0.63f;
-        private static final float BOTTOM_RIGHT_COMPLICATION_RIGHT = 0.83f;
+        private static final float BOTTOM_COMPLICATIONS_TOP = 0.56f;
+        private static final float BOTTOM_COMPLICATIONS_BOTTOM = 0.75f;
+        private static final float BOTTOM_MIDDLE_COMPLICATION_LEFT = 0.405f;
+        private static final float BOTTOM_MIDDLE_COMPLICATION_RIGHT = 0.595f;
+        private static final float BOTTOM_LEFT_COMPLICATION_LEFT = 0.185f;
+        private static final float BOTTOM_LEFT_COMPLICATION_RIGHT = 0.375f;
+        private static final float BOTTOM_RIGHT_COMPLICATION_LEFT = 0.625f;
+        private static final float BOTTOM_RIGHT_COMPLICATION_RIGHT = 0.815f;
         private Rect leftComplication;
         private Rect middleComplication;
         private Rect rightComplication;
@@ -248,7 +249,7 @@ public class WatchFace extends CanvasWatchFaceService {
             secondsPaint.setTextSize(DEFAULT_SECONDS_SIZE * smaller);
             float timeLength = timePaint.measureText("12:34");
             timeX = (float) (width / 2) - (timeLength / 2);
-            timeY = (float) height / 2;
+            timeY = height * DEFAULT_TIME_Y;
             dateY = (float) (height / 2) + DEFAULT_DATE_VERTICAL_OFFSET * height;
             secondsX = timeLength + timeX;
             float dateSize = DEFAULT_DATE_SIZE * width;
