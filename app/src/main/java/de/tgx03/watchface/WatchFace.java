@@ -361,12 +361,14 @@ public class WatchFace extends CanvasWatchFaceService {
                 dateX = (float) (bounds.right / 2) - average;
                 lastDate = date;
             }
-            // Clear the background
-            canvas.drawRect(bounds, background);
             // Draw the background complication if not in ambient and one is set
             if (!isInAmbientMode() && validBackground) {
                 Log.d(TAG, "Drawing background complication");
                 complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
+            } else {
+                // Clear the background
+                Log.d(TAG, "Clearing background");
+                canvas.drawRect(bounds, background);
             }
             // Draw default ambient
             if (isInAmbientMode() && !requiredBurnInProtection) {
