@@ -173,12 +173,12 @@ public class WatchFace extends CanvasWatchFaceService {
         private static final float DEFAULT_DATE_SIZE = 0.07f;
 
         // Styles for elements
-        private Paint background;
-        private Paint timePaint;
-        private Paint timePaintAmbient;
-        private Paint datePaint;
-        private Paint datePaintAmbient;
-        private Paint secondsPaint;
+        private final Paint background = new Paint();
+        private final Paint timePaint = new Paint();
+        private final Paint timePaintAmbient = new Paint();
+        private final Paint datePaint = new Paint();
+        private final Paint datePaintAmbient = new Paint();
+        private final Paint secondsPaint = new Paint();
 
         private final Calendar calendar = Calendar.getInstance();
 
@@ -220,28 +220,25 @@ public class WatchFace extends CanvasWatchFaceService {
 
             filter.addAction(Intent.ACTION_LOCALE_CHANGED);
 
-            background = new Paint();
             background.setColor(Color.BLACK);
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAccentColor(getColor(R.color.date)).setAcceptsTapEvents(true).build());
-            timePaint = new Paint();
+
             timePaint.setColor(getResources().getColor(R.color.time, getTheme()));
             timePaint.setTypeface(Typeface.DEFAULT_BOLD);
             timePaint.setAntiAlias(true);
 
-            timePaintAmbient = new Paint(timePaint);
+            timePaintAmbient.set(timePaint);
 
-            secondsPaint = new Paint();
             secondsPaint.setColor(getResources().getColor(R.color.seconds, getTheme()));
             secondsPaint.setTypeface(Typeface.DEFAULT);
             secondsPaint.setAntiAlias(true);
 
-            datePaint = new Paint();
             datePaint.setColor(getResources().getColor(R.color.date, getTheme()));
             datePaint.setTypeface(Typeface.DEFAULT);
             datePaint.setAntiAlias(true);
 
-            datePaintAmbient = new Paint(datePaint);
+            datePaintAmbient.set(datePaint);
             datePaintAmbient.setColor(Color.WHITE);
 
             initializeComplications();
