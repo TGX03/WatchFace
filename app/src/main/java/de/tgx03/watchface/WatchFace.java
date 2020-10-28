@@ -61,8 +61,8 @@ public class WatchFace extends CanvasWatchFaceService {
                     ComplicationData.TYPE_RANGED_VALUE,
                     ComplicationData.TYPE_SMALL_IMAGE}};
 
-    private ComplicationDrawable[] complicationDrawables;
-    private ComplicationData[] complicationData;
+    private final ComplicationDrawable[] complicationDrawables = new ComplicationDrawable[COMPLICATION_SUPPORTED_TYPES.length];
+    private final ComplicationData[] complicationData = new ComplicationData[COMPLICATION_SUPPORTED_TYPES.length];
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -590,7 +590,6 @@ public class WatchFace extends CanvasWatchFaceService {
          */
         private void initializeComplications() {
             Log.d(TAG, "Initializing complications");
-            complicationDrawables = new ComplicationDrawable[5];
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
             background.setContext(getApplicationContext());
@@ -611,8 +610,6 @@ public class WatchFace extends CanvasWatchFaceService {
             complicationDrawables[BOTTOM_LEFT_COMPLICATION] = left;
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION] = middle;
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION] = right;
-
-            complicationData = new ComplicationData[5];
 
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
