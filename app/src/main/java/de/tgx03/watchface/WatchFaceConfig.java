@@ -47,14 +47,18 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
                 topButton.setImageDrawable(complicationSet);
             }
             if (bounds[1]) {
+                ImageButton bottomLargeButton = findViewById(R.id.SelectBottomLargeComplication);
+                bottomLargeButton.setImageDrawable(complicationSet);
+            }
+            if (bounds[2]) {
                 ImageButton leftButton = findViewById(R.id.SelectLeftComplication);
                 leftButton.setImageDrawable(complicationSet);
             }
-            if (bounds[2]) {
+            if (bounds[3]) {
                 ImageButton middleButton = findViewById(R.id.SelectMiddleComplication);
                 middleButton.setImageDrawable(complicationSet);
             }
-            if (bounds[3]) {
+            if (bounds[4]) {
                 ImageButton rightButton = findViewById(R.id.SelectRightComplication);
                 rightButton.setImageDrawable(complicationSet);
             }
@@ -70,34 +74,38 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     public void chooseBackground(View view) {
         Log.d(TAG, "Choosing background complication");
-        launchComplicationHelperActivity(ComplicationID.BACKGROUND);
+        launchComplicationHelperActivity(WatchFace.BACKGROUND_COMPLICATION);
     }
 
     public void chooseTopComplication(View view) {
         Log.d(TAG, "Choosing top complication");
-        launchComplicationHelperActivity(ComplicationID.TOP);
+        launchComplicationHelperActivity(WatchFace.TOP_COMPLICATION);
+    }
+
+    public void chooseBottomLargeComplication(View view) {
+        Log.d(TAG, "Choosing large bottom complication");
+        launchComplicationHelperActivity(WatchFace.BOTTOM_LARGE_COMPLICATION);
     }
 
     public void chooseBottomComplication(View view) {
         Log.d(TAG, "Choosing a bottom complication");
         if (view.equals(findViewById(R.id.SelectMiddleComplication))) {
-            launchComplicationHelperActivity(ComplicationID.BOTTOM_MIDDLE);
+            launchComplicationHelperActivity(WatchFace.BOTTOM_MIDDLE_COMPLICATION);
         } else if (view.equals(findViewById(R.id.SelectLeftComplication))) {
-            launchComplicationHelperActivity(ComplicationID.BOTTOM_LEFT);
+            launchComplicationHelperActivity(WatchFace.BOTTOM_LEFT_COMPLICATION);
         } else if (view.equals(findViewById(R.id.SelectRightComplication))) {
-            launchComplicationHelperActivity(ComplicationID.BOTTOM_RIGHT);
+            launchComplicationHelperActivity(WatchFace.BOTTOM_RIGHT_COMPLICATION);
         }
     }
 
-    private void launchComplicationHelperActivity(ComplicationID id) {
-        byte selectedComplication = WatchFace.getComplicationID(id);
-        Log.d(TAG, "Launching complication chooser for complication " + selectedComplication);
+    private void launchComplicationHelperActivity(byte id) {
+        Log.d(TAG, "Launching complication chooser for complication " + id);
 
-        if (selectedComplication >= 0) {
+        if (id >= 0) {
             int[] supportedTypes = WatchFace.getSupportedComplications(id);
 
             startActivityForResult(ComplicationHelperActivity.createProviderChooserHelperIntent(
-                    getApplicationContext(), watchFaceComponent, selectedComplication, supportedTypes
+                    getApplicationContext(), watchFaceComponent, id, supportedTypes
             ), COMPLICATION_CONFIG_REQUEST_CODE);
         }
     }

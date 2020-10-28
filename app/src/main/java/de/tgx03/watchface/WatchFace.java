@@ -40,11 +40,12 @@ public class WatchFace extends CanvasWatchFaceService {
     private static boolean complicationsInAmbient = true;
 
     // Complication IDs
-    private static final byte BACKGROUND_COMPLICATION = 0;
-    private static final byte TOP_COMPLICATION = 1;
-    private static final byte BOTTOM_LEFT_COMPLICATION = 2;
-    private static final byte BOTTOM_MIDDLE_COMPLICATION = 3;
-    private static final byte BOTTOM_RIGHT_COMPLICATION = 4;
+    protected static final byte BACKGROUND_COMPLICATION = 0;
+    protected static final byte TOP_COMPLICATION = 1;
+    protected static final byte BOTTOM_LARGE_COMPLICATION = 2;
+    protected static final byte BOTTOM_LEFT_COMPLICATION = 3;
+    protected static final byte BOTTOM_MIDDLE_COMPLICATION = 4;
+    protected static final byte BOTTOM_RIGHT_COMPLICATION = 5;
 
     private static final int[][] COMPLICATION_SUPPORTED_TYPES = {
             // Background Complication
@@ -61,8 +62,8 @@ public class WatchFace extends CanvasWatchFaceService {
                     ComplicationData.TYPE_RANGED_VALUE,
                     ComplicationData.TYPE_SMALL_IMAGE}};
 
-    private final ComplicationDrawable[] complicationDrawables = new ComplicationDrawable[5];
-    private final ComplicationData[] complicationData = new ComplicationData[5];
+    private final ComplicationDrawable[] complicationDrawables = new ComplicationDrawable[6];
+    private final ComplicationData[] complicationData = new ComplicationData[6];
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -89,32 +90,16 @@ public class WatchFace extends CanvasWatchFaceService {
         }
     }
 
-    protected static byte getComplicationID(ComplicationID id) {
+    protected static int[] getSupportedComplications(byte id) {
         switch (id) {
-            case BACKGROUND:
-                return BACKGROUND_COMPLICATION;
-            case TOP:
-                return TOP_COMPLICATION;
-            case BOTTOM_LEFT:
-                return BOTTOM_LEFT_COMPLICATION;
-            case BOTTOM_MIDDLE:
-                return BOTTOM_MIDDLE_COMPLICATION;
-            case BOTTOM_RIGHT:
-                return BOTTOM_RIGHT_COMPLICATION;
-            default:
-                return -1;
-        }
-    }
-
-    protected static int[] getSupportedComplications(ComplicationID id) {
-        switch (id) {
-            case BACKGROUND:
+            case BACKGROUND_COMPLICATION:
                 return COMPLICATION_SUPPORTED_TYPES[0];
-            case TOP:
+            case TOP_COMPLICATION:
+            case BOTTOM_LARGE_COMPLICATION:
                 return COMPLICATION_SUPPORTED_TYPES[1];
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-            case BOTTOM_MIDDLE:
+            case BOTTOM_LEFT_COMPLICATION:
+            case BOTTOM_RIGHT_COMPLICATION:
+            case BOTTOM_MIDDLE_COMPLICATION:
                 return COMPLICATION_SUPPORTED_TYPES[2];
             default:
                 return new int[0];
@@ -186,16 +171,23 @@ public class WatchFace extends CanvasWatchFaceService {
 
         private boolean validBackground = false;
 
+        // Left and right boundaries for large complications
+        private static final float LARGE_COMPLICATION_LEFT = 0.2f;
+        private static final float LARGE_COMPLICATION_RIGHT = 0.8f;
+
         // The coordinates for the large top complication
-        private static final float TOP_COMPLICATION_LEFT = 0.2f;
         private static final float TOP_COMPLICATION_TOP = 0.1f;
-        private static final float TOP_COMPLICATION_RIGHT = 0.8f;
         private static final float TOP_COMPLICATION_BOTTOM = 0.25f;
         private Rect topComplication;
 
+        // The coordinates of the large bottom complication
+        private static final float BOTTOM_LARGE_COMPLICATION_TOP = 0.78f;
+        private static final float BOTTOM_LARGE_COMPLICATION_BOTTOM = 0.93f;
+        private Rect bottomLargeComplication;
+
         // The coordinates for the smaller bottom complications
-        private static final float BOTTOM_COMPLICATIONS_TOP = 0.65f;
-        private static final float BOTTOM_COMPLICATIONS_BOTTOM = 0.85f;
+        private static final float BOTTOM_COMPLICATIONS_TOP = 0.615f;
+        private static final float BOTTOM_COMPLICATIONS_BOTTOM = 0.765f;
         private static final float BOTTOM_MIDDLE_COMPLICATION_LEFT = 0.4f;
         private static final float BOTTOM_MIDDLE_COMPLICATION_RIGHT = 0.6f;
         private static final float BOTTOM_LEFT_COMPLICATION_LEFT = 0.17f;
@@ -267,8 +259,11 @@ public class WatchFace extends CanvasWatchFaceService {
             complicationDrawables[BACKGROUND_COMPLICATION].setBounds(backgroundComplication);
 
             Log.d(TAG, "Calculating complication bounds");
-            topComplication = new Rect(Math.round(TOP_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(TOP_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
+            topComplication = new Rect(Math.round(LARGE_COMPLICATION_LEFT * width), Math.round(TOP_COMPLICATION_TOP * height), Math.round(LARGE_COMPLICATION_RIGHT * width), Math.round(TOP_COMPLICATION_BOTTOM * height));
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+
+            bottomLargeComplication = new Rect(Math.round(LARGE_COMPLICATION_LEFT * width), Math.round(BOTTOM_LARGE_COMPLICATION_TOP * height), Math.round(LARGE_COMPLICATION_RIGHT * width), Math.round(BOTTOM_LARGE_COMPLICATION_BOTTOM * height));
+            complicationDrawables[BOTTOM_LARGE_COMPLICATION].setBounds(bottomLargeComplication);
 
             middleComplication = new Rect(Math.round(BOTTOM_MIDDLE_COMPLICATION_LEFT * smaller), Math.round(BOTTOM_COMPLICATIONS_TOP * smaller), Math.round(BOTTOM_MIDDLE_COMPLICATION_RIGHT * smaller), Math.round(BOTTOM_COMPLICATIONS_BOTTOM * smaller));
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
@@ -282,6 +277,7 @@ public class WatchFace extends CanvasWatchFaceService {
             if (!requiredBurnInProtection) {
                 Log.d(TAG, "Clearing set Rectangles because they're not needed without burn in protection");
                 topComplication = null;
+                bottomLargeComplication = null;
                 leftComplication = null;
                 middleComplication = null;
                 rightComplication = null;
@@ -296,12 +292,14 @@ public class WatchFace extends CanvasWatchFaceService {
             if (!requiredBurnInProtection && (topComplication != null || leftComplication != null || middleComplication != null || rightComplication != null)) {
                 restoreCoordinates();
                 topComplication = null;
+                bottomLargeComplication = null;
                 leftComplication = null;
                 middleComplication = null;
                 rightComplication = null;
                 // Get complication bounds because they're needed for burn in protection
             } else if (requiredBurnInProtection && (topComplication == null || leftComplication == null || middleComplication == null || rightComplication == null)) {
                 topComplication = complicationDrawables[TOP_COMPLICATION].getBounds();
+                bottomLargeComplication = complicationDrawables[BOTTOM_LARGE_COMPLICATION].getBounds();
                 leftComplication = complicationDrawables[BOTTOM_LEFT_COMPLICATION].getBounds();
                 middleComplication = complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].getBounds();
                 rightComplication = complicationDrawables[BOTTOM_RIGHT_COMPLICATION].getBounds();
@@ -488,14 +486,17 @@ public class WatchFace extends CanvasWatchFaceService {
                 offset = -offset;
             }
             Rect topComplication = new Rect(this.topComplication);
+            Rect bottomLargeComplication = new Rect(this.bottomLargeComplication);
             Rect leftComplication = new Rect(this.leftComplication);
             Rect middleComplication = new Rect(this.middleComplication);
             Rect rightComplication = new Rect(this.rightComplication);
             topComplication.offset(offset, 0);
+            bottomLargeComplication.offset(offset, 0);
             leftComplication.offset(offset, 0);
             middleComplication.offset(offset, 0);
             rightComplication.offset(offset, 0);
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+            complicationDrawables[BOTTOM_LARGE_COMPLICATION].setBounds(bottomLargeComplication);
             complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
@@ -512,6 +513,7 @@ public class WatchFace extends CanvasWatchFaceService {
         private void restoreCoordinates() {
             Log.d(TAG, "restoring Coordinates");
             complicationDrawables[TOP_COMPLICATION].setBounds(topComplication);
+            complicationDrawables[BOTTOM_LARGE_COMPLICATION].setBounds(bottomLargeComplication);
             complicationDrawables[BOTTOM_LEFT_COMPLICATION].setBounds(leftComplication);
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION].setBounds(middleComplication);
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION].setBounds(rightComplication);
@@ -591,12 +593,15 @@ public class WatchFace extends CanvasWatchFaceService {
         private void initializeComplications() {
             Log.d(TAG, "Initializing complications");
 
-            for (byte i = 0; i < complicationDrawables.length; i++) {
+            complicationDrawables[BACKGROUND_COMPLICATION] = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
+            complicationDrawables[BACKGROUND_COMPLICATION].setContext(getApplicationContext());
+
+            for (byte i = 1; i < complicationDrawables.length; i++) {
                 complicationDrawables[i] = (ComplicationDrawable) getDrawable(R.drawable.complication);
                 complicationDrawables[i].setContext(getApplicationContext());
             }
 
-            setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
+            setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LARGE_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
 
         /**
