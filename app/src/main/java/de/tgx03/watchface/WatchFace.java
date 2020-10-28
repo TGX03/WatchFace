@@ -61,8 +61,8 @@ public class WatchFace extends CanvasWatchFaceService {
                     ComplicationData.TYPE_RANGED_VALUE,
                     ComplicationData.TYPE_SMALL_IMAGE}};
 
-    private final ComplicationDrawable[] complicationDrawables = new ComplicationDrawable[COMPLICATION_SUPPORTED_TYPES.length];
-    private final ComplicationData[] complicationData = new ComplicationData[COMPLICATION_SUPPORTED_TYPES.length];
+    private final ComplicationDrawable[] complicationDrawables = new ComplicationDrawable[5];
+    private final ComplicationData[] complicationData = new ComplicationData[5];
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
