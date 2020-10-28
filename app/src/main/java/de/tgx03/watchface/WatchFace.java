@@ -592,24 +592,22 @@ public class WatchFace extends CanvasWatchFaceService {
             Log.d(TAG, "Initializing complications");
 
             ComplicationDrawable background = (ComplicationDrawable) getDrawable(R.drawable.background_complication);
-            background.setContext(getApplicationContext());
             complicationDrawables[BACKGROUND_COMPLICATION] = background;
 
             ComplicationDrawable top = (ComplicationDrawable) getDrawable(R.drawable.complication);
-            top.setContext(getApplicationContext());
             complicationDrawables[TOP_COMPLICATION] = top;
 
             ComplicationDrawable left = (ComplicationDrawable) getDrawable(R.drawable.complication);
             ComplicationDrawable middle = (ComplicationDrawable) getDrawable(R.drawable.complication);
             ComplicationDrawable right = (ComplicationDrawable) getDrawable(R.drawable.complication);
 
-            left.setContext(getApplicationContext());
-            middle.setContext(getApplicationContext());
-            right.setContext(getApplicationContext());
-
             complicationDrawables[BOTTOM_LEFT_COMPLICATION] = left;
             complicationDrawables[BOTTOM_MIDDLE_COMPLICATION] = middle;
             complicationDrawables[BOTTOM_RIGHT_COMPLICATION] = right;
+
+            for (ComplicationDrawable drawable : complicationDrawables) {
+                drawable.setContext(getApplicationContext());
+            }
 
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
