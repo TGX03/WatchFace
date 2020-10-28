@@ -605,7 +605,7 @@ public class WatchFace extends CanvasWatchFaceService {
          * @param time The time the complications should use when drawing
          */
         private void drawComplications(Canvas canvas, long time) {
-            for (byte i = 1; i < 5; i++) {
+            for (byte i = 1; i < complicationDrawables.length; i++) {
                 complicationDrawables[i].draw(canvas, time);
             }
         }
