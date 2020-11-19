@@ -39,6 +39,9 @@ public class WatchFace extends CanvasWatchFaceService {
 
     private static boolean complicationsInAmbient = true;
 
+    // Which complications shall be drawn when in ambient mode
+    protected static final boolean[] complicationInAmbient = new boolean[6];
+
     // Complication IDs
     protected static final byte BACKGROUND_COMPLICATION = 0;
     protected static final byte TOP_COMPLICATION = 1;
@@ -357,15 +360,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 dateX = (float) (bounds.right / 2) - average;
                 lastDate = date;
             }
-            // Draw the background complication if not in ambient and one is set
-            if (!isInAmbientMode() && validBackground) {
-                Log.d(TAG, "Drawing background complication");
-                complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, now);
-            } else {
-                // Clear the background
-                Log.d(TAG, "Clearing background");
-                canvas.drawRect(bounds, background);
-            }
+            drawBackground(canvas, bounds, now);
             // Draw default ambient
             if (isInAmbientMode() && !requiredBurnInProtection) {
                 Log.d(TAG, "Drawing ambient, no burn in protection");
@@ -386,9 +381,7 @@ public class WatchFace extends CanvasWatchFaceService {
                 canvas.drawText(second, secondsX, timeY, secondsPaint);
             }
             // Draw complications
-            if (!isInAmbientMode() || complicationsInAmbient) {
-                drawComplications(canvas, now);
-            }
+            drawComplications(canvas, now);
         }
 
         public void onVisibilityChanged(boolean visible) {
@@ -605,6 +598,18 @@ public class WatchFace extends CanvasWatchFaceService {
             setActiveComplications(BACKGROUND_COMPLICATION, TOP_COMPLICATION, BOTTOM_LARGE_COMPLICATION, BOTTOM_LEFT_COMPLICATION, BOTTOM_MIDDLE_COMPLICATION, BOTTOM_RIGHT_COMPLICATION);
         }
 
+        private void drawBackground(Canvas canvas, Rect bounds, long time) {
+            // Draw the background complication if not in ambient and one is set
+            if (validBackground && (!isInAmbientMode() || complicationEnabledInAmbient(0))) {
+                Log.d(TAG, "Drawing background complication");
+                complicationDrawables[BACKGROUND_COMPLICATION].draw(canvas, time);
+            } else {
+                // Clear the background
+                Log.d(TAG, "Clearing background");
+                canvas.drawRect(bounds, background);
+            }
+        }
+
         /**
          * Draws the foreground complications on the provided canvas
          * @param canvas The canvas the complications should be drawn on
@@ -612,7 +617,17 @@ public class WatchFace extends CanvasWatchFaceService {
          */
         private void drawComplications(Canvas canvas, long time) {
             for (byte i = 1; i < complicationDrawables.length; i++) {
-                complicationDrawables[i].draw(canvas, time);
+                if (!isInAmbientMode() || complicationInAmbient[i]) {
+                    complicationDrawables[i].draw(canvas, time);
+                }
+            }
+        }
+
+        protected boolean complicationEnabledInAmbient(int id) {
+            if (!complicationsInAmbient) {
+                return false;
+            } else {
+                return complicationInAmbient[id];
             }
         }
 

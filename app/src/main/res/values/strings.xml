@@ -4,4 +4,5 @@
     <string name="name">Digital WatchFace</string>
     <string name="background">Background</string>
     <string name="complicationsAmbient">Complications in Ambient</string>
+    <string name="ambient_complication_chooser">Select Complications for Ambient</string>
 </resources>

@@ -2,4 +2,5 @@
 <resources>
     <string name="background">Hintergrund</string>
     <string name="complicationsAmbient">Komplikationen während Ambient</string>
+    <string name="ambient_complication_chooser">Komplikationen während Ambient auswählen</string>
 </resources>

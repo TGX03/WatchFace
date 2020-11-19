@@ -2,7 +2,10 @@ package de.tgx03.watchface;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationHelperActivity;
@@ -23,6 +26,8 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     private Switch complicationsInAmbient;
 
+    private Bitmap watchFace;
+
     protected void onCreate(Bundle savedInstance) {
         Log.d(TAG, "Creating config activity");
 
@@ -37,8 +42,8 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
         try {
             Log.d(TAG, "Getting watchface screenshot");
-            Bitmap watchFace = WatchFace.getEngine().screenshot();
-            ImageView image = findViewById(R.id.settingspreview);
+            watchFace = WatchFace.getEngine().screenshot();
+            ImageView image = findViewById(R.id.watchpreview);
             image.setImageBitmap(watchFace);
             boolean[] bounds = WatchFace.getEngine().complicationLocations();
             Drawable complicationSet = getDrawable(R.drawable.added_complication);
@@ -96,6 +101,12 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         } else if (view.equals(findViewById(R.id.SelectRightComplication))) {
             launchComplicationHelperActivity(WatchFace.BOTTOM_RIGHT_COMPLICATION);
         }
+    }
+
+    public void launchAmbientComplicationSelector(View view) {
+        Intent launcherData = new Intent(this, AmbientBackgroundSelector.class);
+        launcherData.putExtra("background", watchFace);
+        startActivity(launcherData);
     }
 
     private void launchComplicationHelperActivity(byte id) {

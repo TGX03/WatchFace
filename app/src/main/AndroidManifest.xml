@@ -55,6 +55,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <activity android:name=".AmbientBackgroundSelector" android:label="WatchFace"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
