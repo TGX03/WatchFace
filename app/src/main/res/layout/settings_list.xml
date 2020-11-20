@@ -1,110 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:onClick="chooseBottomLargeComplication"
-    android:orientation="vertical">
+    android:fillViewport="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
-    <ScrollView
+    <requestFocus />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:orientation="vertical"
+        android:paddingBottom="35dp">
 
-        <requestFocus />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="35dp">
+            android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/settingspreview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/preview"
-                    android:visibility="visible" />
-
-                <ImageButton
-                    android:id="@+id/SelectTopComplication"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:onClick="chooseTopComplication"
-                    android:src="@drawable/add_complication" />
-
-                <ImageButton
-                    android:id="@+id/SelectBottomLargeComplication"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/settingspreview"
-                    android:layout_centerHorizontal="true"
-                    android:background="@android:color/transparent"
-                    android:onClick="chooseBottomLargeComplication"
-                    android:src="@drawable/add_complication" />
-
-                <ImageButton
-                    android:id="@+id/SelectMiddleComplication"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/SelectBottomLargeComplication"
-                    android:layout_centerHorizontal="true"
-                    android:background="@android:color/transparent"
-                    android:onClick="chooseBottomComplication"
-                    android:src="@drawable/add_complication" />
-
-                <ImageButton
-                    android:id="@+id/SelectLeftComplication"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/SelectBottomLargeComplication"
-                    android:layout_marginEnd="4dp"
-                    android:layout_toLeftOf="@id/SelectMiddleComplication"
-                    android:background="@android:color/transparent"
-                    android:onClick="chooseBottomComplication"
-                    android:src="@drawable/add_complication" />
-
-                <ImageButton
-                    android:id="@+id/SelectRightComplication"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/SelectBottomLargeComplication"
-                    android:layout_marginStart="4dp"
-                    android:layout_toRightOf="@id/SelectMiddleComplication"
-                    android:background="@android:color/transparent"
-                    android:onClick="chooseBottomComplication"
-                    android:src="@drawable/add_complication" />
-
-            </RelativeLayout>
-
-            <Button
-                android:id="@+id/background_chooser"
+            <ImageView
+                android:id="@+id/settingspreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="-7dp"
-                android:backgroundTint="@android:color/transparent"
-                android:onClick="chooseBackground"
-                android:text="@string/background" />
+                android:adjustViewBounds="true"
+                android:src="@drawable/preview"
+                android:visibility="visible" />
 
-            <Switch
-                android:id="@+id/ComplicationsInAmbient"
+            <ImageButton
+                android:id="@+id/SelectTopComplication"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:scaleX="0.8"
-                android:scaleY="0.85"
-                android:text="@string/complicationsAmbient" />
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:onClick="chooseTopComplication"
+                android:src="@drawable/add_complication" />
 
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+            <ImageButton
+                android:id="@+id/SelectBottomLargeComplication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/settingspreview"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/transparent"
+                android:onClick="chooseBottomLargeComplication"
+                android:src="@drawable/add_complication" />
+
+            <ImageButton
+                android:id="@+id/SelectMiddleComplication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/SelectBottomLargeComplication"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/transparent"
+                android:onClick="chooseBottomComplication"
+                android:src="@drawable/add_complication" />
+
+            <ImageButton
+                android:id="@+id/SelectLeftComplication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/SelectBottomLargeComplication"
+                android:layout_marginEnd="4dp"
+                android:layout_toLeftOf="@id/SelectMiddleComplication"
+                android:background="@android:color/transparent"
+                android:onClick="chooseBottomComplication"
+                android:src="@drawable/add_complication" />
+
+            <ImageButton
+                android:id="@+id/SelectRightComplication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/SelectBottomLargeComplication"
+                android:layout_marginStart="4dp"
+                android:layout_toRightOf="@id/SelectMiddleComplication"
+                android:background="@android:color/transparent"
+                android:onClick="chooseBottomComplication"
+                android:src="@drawable/add_complication" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/background_chooser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-7dp"
+            android:backgroundTint="@android:color/transparent"
+            android:onClick="chooseBackground"
+            android:text="@string/background" />
+
+        <Switch
+            android:id="@+id/ComplicationsInAmbient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:scaleX="0.8"
+            android:scaleY="0.85"
+            android:text="@string/complicationsAmbient" />
+
+    </LinearLayout>
+</ScrollView>
