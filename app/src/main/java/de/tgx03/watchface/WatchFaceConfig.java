@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 
+import static de.tgx03.watchface.WatchFace.complicationsInAmbient;
 import static de.tgx03.watchface.WatchFace.emptyComplications;
 
 public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
@@ -23,7 +24,7 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
 
     private ComponentName watchFaceComponent;
 
-    private Switch complicationsInAmbient;
+    private Switch complicationsInAmbientSwitch;
     private Switch emptyComplicationsSwitch;
 
     protected void onCreate(Bundle savedInstance) {
@@ -34,9 +35,9 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         watchFaceComponent = new ComponentName(getApplicationContext(), WatchFace.class);
 
         setContentView(R.layout.settings_list);
-        complicationsInAmbient = findViewById(R.id.ComplicationsInAmbient);
-        complicationsInAmbient.setChecked(WatchFace.getComplicationsInAmbient());
-        complicationsInAmbient.setOnCheckedChangeListener(this);
+        complicationsInAmbientSwitch = findViewById(R.id.ComplicationsInAmbient);
+        complicationsInAmbientSwitch.setChecked(complicationsInAmbient);
+        complicationsInAmbientSwitch.setOnCheckedChangeListener(this);
 
         emptyComplicationsSwitch = findViewById(R.id.empty_complications);
         emptyComplicationsSwitch.setChecked(emptyComplications);
@@ -120,8 +121,8 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         Log.d(TAG, "Ambient complications were changed");
-        if (buttonView == complicationsInAmbient) {
-            WatchFace.setComplicationsInAmbient(isChecked);
+        if (buttonView == complicationsInAmbientSwitch) {
+            complicationsInAmbient = isChecked;
         } else if (buttonView == emptyComplicationsSwitch) {
             emptyComplications = isChecked;
         }

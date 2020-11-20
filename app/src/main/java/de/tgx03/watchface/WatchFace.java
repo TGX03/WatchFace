@@ -37,7 +37,7 @@ public class WatchFace extends CanvasWatchFaceService {
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
 
-    private static boolean complicationsInAmbient = true;
+    protected static boolean complicationsInAmbient = true;
     protected static boolean emptyComplications = false;
 
     // Complication IDs
@@ -105,23 +105,6 @@ public class WatchFace extends CanvasWatchFaceService {
             default:
                 return new int[0];
         }
-    }
-
-    /**
-     * This method sets whether complications should be rendered in ambient mode
-     * @param enabled Whether complications shall be shown in ambient mode
-     */
-    protected static void setComplicationsInAmbient(boolean enabled) {
-        Log.d(TAG, "Complications in ambient " + (enabled ? "enabled" : "disabled"));
-        complicationsInAmbient = enabled;
-    }
-
-    /**
-     * Returns whether complications currently get rendered in ambient mode
-     * @return Whether complications are currently enabled in ambient mode
-     */
-    protected static boolean getComplicationsInAmbient() {
-        return complicationsInAmbient;
     }
 
     protected class Engine extends CanvasWatchFaceService.Engine {
