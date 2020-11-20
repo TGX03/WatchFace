@@ -47,25 +47,25 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
             Bitmap watchFace = WatchFace.getEngine().screenshot();
             ImageView image = findViewById(R.id.settingspreview);
             image.setImageBitmap(watchFace);
-            boolean[] bounds = WatchFace.getEngine().complicationLocations();
+            boolean[] setComplications = WatchFace.getEngine().complicationLocations();
             Drawable complicationSet = getDrawable(R.drawable.added_complication);
-            if (bounds[0]) {
+            if (setComplications[0]) {
                 ImageButton topButton = findViewById(R.id.SelectTopComplication);
                 topButton.setImageDrawable(complicationSet);
             }
-            if (bounds[1]) {
+            if (setComplications[1]) {
                 ImageButton bottomLargeButton = findViewById(R.id.SelectBottomLargeComplication);
                 bottomLargeButton.setImageDrawable(complicationSet);
             }
-            if (bounds[2]) {
+            if (setComplications[2]) {
                 ImageButton leftButton = findViewById(R.id.SelectLeftComplication);
                 leftButton.setImageDrawable(complicationSet);
             }
-            if (bounds[3]) {
+            if (setComplications[3]) {
                 ImageButton middleButton = findViewById(R.id.SelectMiddleComplication);
                 middleButton.setImageDrawable(complicationSet);
             }
-            if (bounds[4]) {
+            if (setComplications[4]) {
                 ImageButton rightButton = findViewById(R.id.SelectRightComplication);
                 rightButton.setImageDrawable(complicationSet);
             }
