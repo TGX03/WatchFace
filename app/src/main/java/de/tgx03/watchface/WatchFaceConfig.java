@@ -16,6 +16,10 @@ import android.widget.Switch;
 import static de.tgx03.watchface.WatchFace.complicationsInAmbient;
 import static de.tgx03.watchface.WatchFace.emptyComplications;
 
+/**
+ * A class representing the settings for the watchface
+ * which are the complications and settings for when they should be drawn
+ */
 public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = "WatchFaceConfig";
@@ -80,21 +84,41 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         Log.d(TAG, "Destroyed config activity");
     }
 
+    /**
+     * Launches the dialog to select the background complication
+     *
+     * @param view The view calling this method
+     */
     public void chooseBackground(View view) {
         Log.d(TAG, "Choosing background complication");
         launchComplicationHelperActivity(WatchFace.BACKGROUND_COMPLICATION);
     }
 
+    /**
+     * Launches the dialog to select the top complication
+     *
+     * @param view The view calling this method
+     */
     public void chooseTopComplication(View view) {
         Log.d(TAG, "Choosing top complication");
         launchComplicationHelperActivity(WatchFace.TOP_COMPLICATION);
     }
 
+    /**
+     * Launches the dialog to select the bottom complication
+     *
+     * @param view The view calling this method
+     */
     public void chooseBottomLargeComplication(View view) {
         Log.d(TAG, "Choosing large bottom complication");
         launchComplicationHelperActivity(WatchFace.BOTTOM_LARGE_COMPLICATION);
     }
 
+    /**
+     * Launches the dialog to select one of the three smaller complications
+     *
+     * @param view The view calling this method
+     */
     public void chooseBottomComplication(View view) {
         Log.d(TAG, "Choosing a bottom complication");
         if (view.equals(findViewById(R.id.SelectMiddleComplication))) {
@@ -106,6 +130,11 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         }
     }
 
+    /**
+     * Launches the system dialog to select a complication for a given complication id
+     *
+     * @param id The id of the complication to set
+     */
     private void launchComplicationHelperActivity(byte id) {
         Log.d(TAG, "Launching complication chooser for complication " + id);
 

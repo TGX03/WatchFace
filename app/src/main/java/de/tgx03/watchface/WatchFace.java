@@ -37,7 +37,13 @@ public class WatchFace extends CanvasWatchFaceService {
     // Updates rate in milliseconds for interactive mode
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
 
+    /**
+     * Whether complications get drawn in ambient
+     */
     protected static boolean complicationsInAmbient = true;
+    /**
+     * Whether complications with no data get drawn
+     */
     protected static boolean emptyComplications = false;
 
     // Complication IDs
@@ -80,6 +86,7 @@ public class WatchFace extends CanvasWatchFaceService {
     /**
      * Retrieves the last created engine. Only gets used for creating screenshots in the settings.
      * Throws errors when no engine has been created. Only to be used in the package
+     *
      * @return The last created engine
      * @throws IllegalStateException Gets thrown when an engine hasn't yet been created
      */
@@ -91,6 +98,12 @@ public class WatchFace extends CanvasWatchFaceService {
         }
     }
 
+    /**
+     * Shows which types of complication are supported by a specific complication
+     *
+     * @param id The id of the requested complication
+     * @return All the types supported by this complications
+     */
     protected static int[] getSupportedComplications(byte id) {
         switch (id) {
             case BACKGROUND_COMPLICATION:
@@ -269,7 +282,7 @@ public class WatchFace extends CanvasWatchFaceService {
             }
         }
 
-        public void onPropertiesChanged (Bundle properties) {
+        public void onPropertiesChanged(Bundle properties) {
             super.onPropertiesChanged(properties);
 
             requiredBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
@@ -333,7 +346,7 @@ public class WatchFace extends CanvasWatchFaceService {
             String time = createTime();
             String date = createDate();
             // Re-calculate the position of the date if it has changed since the last draw
-            if(!date.equals(lastDate)) {
+            if (!date.equals(lastDate)) {
                 String day = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " ";
                 float lengthWODash = datePaint.measureText(day);
                 float lengthWDash = datePaint.measureText(day + "|");
@@ -429,6 +442,7 @@ public class WatchFace extends CanvasWatchFaceService {
         /**
          * Creates a screenshot of how the watch currently looks
          * Gets used for showing a screenshot in the settings menu
+         *
          * @return How the watch currently looks
          * @throws IllegalStateException Gets thrown when the engine isn't fully initialized and therefore cannot produce a valid screenshot
          */
@@ -448,6 +462,7 @@ public class WatchFace extends CanvasWatchFaceService {
         /**
          * Creates an array telling which complications are set and which aren't
          * Gets used by the settings menu to determine which icon gets shown in that place
+         *
          * @return Which complications are set
          */
         protected boolean[] complicationLocations() {
@@ -507,6 +522,7 @@ public class WatchFace extends CanvasWatchFaceService {
         /**
          * Creates a string of the current time in 24h format
          * Because fuck AM/PM
+         *
          * @return A string representing the time
          */
         private String createTime() {
@@ -517,6 +533,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
         /**
          * Creates the string to be shown as date consisting of the weekday, a stroke and the actual date
+         *
          * @return A string of the current day and date
          */
         private String createDate() {
@@ -529,6 +546,7 @@ public class WatchFace extends CanvasWatchFaceService {
 
         /**
          * Creates a string of a numerical value with 2 leading zeroes
+         *
          * @param numbers The value to format
          * @return A string formatted to 2 leading zeroes
          */
@@ -568,6 +586,12 @@ public class WatchFace extends CanvasWatchFaceService {
             }
         }
 
+        /**
+         * Checks whether this wahtchface should currently update itself
+         * or only wait for the system call to do so
+         *
+         * @return Whether the watchface should update itself
+         */
         private boolean shouldTimerRun() {
             return isVisible() && !isInAmbientMode();
         }
@@ -591,8 +615,9 @@ public class WatchFace extends CanvasWatchFaceService {
 
         /**
          * Draws the foreground complications on the provided canvas
+         *
          * @param canvas The canvas the complications should be drawn on
-         * @param time The time the complications should use when drawing
+         * @param time   The time the complications should use when drawing
          */
         private void drawComplications(Canvas canvas, long time) {
             if (emptyComplications) {
@@ -611,6 +636,7 @@ public class WatchFace extends CanvasWatchFaceService {
         /**
          * Finds out which complication the used tapped on
          * Ignores the background complication
+         *
          * @param x The x coordinate of the tapped location
          * @param y The y coordinate of the tapped location
          * @return The ID of the tapped location or -1 if tapped on empty space
