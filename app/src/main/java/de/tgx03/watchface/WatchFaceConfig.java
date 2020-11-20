@@ -13,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 
+import static de.tgx03.watchface.WatchFace.emptyComplications;
+
 public class WatchFaceConfig extends Activity implements CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = "WatchFaceConfig";
@@ -22,6 +24,7 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
     private ComponentName watchFaceComponent;
 
     private Switch complicationsInAmbient;
+    private Switch emptyComplicationsSwitch;
 
     protected void onCreate(Bundle savedInstance) {
         Log.d(TAG, "Creating config activity");
@@ -34,6 +37,10 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         complicationsInAmbient = findViewById(R.id.ComplicationsInAmbient);
         complicationsInAmbient.setChecked(WatchFace.getComplicationsInAmbient());
         complicationsInAmbient.setOnCheckedChangeListener(this);
+
+        emptyComplicationsSwitch = findViewById(R.id.empty_complications);
+        emptyComplicationsSwitch.setChecked(emptyComplications);
+        emptyComplicationsSwitch.setOnCheckedChangeListener(this);
 
         try {
             Log.d(TAG, "Getting watchface screenshot");
@@ -115,6 +122,8 @@ public class WatchFaceConfig extends Activity implements CompoundButton.OnChecke
         Log.d(TAG, "Ambient complications were changed");
         if (buttonView == complicationsInAmbient) {
             WatchFace.setComplicationsInAmbient(isChecked);
+        } else if (buttonView == emptyComplicationsSwitch) {
+            emptyComplications = isChecked;
         }
     }
 }

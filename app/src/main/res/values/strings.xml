@@ -4,4 +4,5 @@
     <string name="name">Digital WatchFace</string>
     <string name="background">Background</string>
     <string name="complicationsAmbient">Complications in Ambient</string>
+    <string name="empty_complications">Draw complications without data</string>
 </resources>

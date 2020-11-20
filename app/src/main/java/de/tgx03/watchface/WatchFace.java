@@ -38,6 +38,7 @@ public class WatchFace extends CanvasWatchFaceService {
     private static final short INTERACTIVE_UPDATE_RATE_MS = 1000;
 
     private static boolean complicationsInAmbient = true;
+    protected static boolean emptyComplications = false;
 
     // Complication IDs
     protected static final byte BACKGROUND_COMPLICATION = 0;
@@ -611,8 +612,16 @@ public class WatchFace extends CanvasWatchFaceService {
          * @param time The time the complications should use when drawing
          */
         private void drawComplications(Canvas canvas, long time) {
-            for (byte i = 1; i < complicationDrawables.length; i++) {
-                complicationDrawables[i].draw(canvas, time);
+            if (emptyComplications) {
+                for (byte i = 1; i < complicationDrawables.length; i++) {
+                    complicationDrawables[i].draw(canvas, time);
+                }
+            } else {
+                for (byte i = 1; i < complicationDrawables.length; i++) {
+                    if (complicationData[i] != null && complicationData[i].getType() != ComplicationData.TYPE_EMPTY && complicationData[i].getType() != ComplicationData.TYPE_NO_DATA && complicationData[i].getType() != ComplicationData.TYPE_NOT_CONFIGURED) {
+                        complicationDrawables[i].draw(canvas, time);
+                    }
+                }
             }
         }
 

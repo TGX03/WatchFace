@@ -2,4 +2,5 @@
 <resources>
     <string name="background">Hintergrund</string>
     <string name="complicationsAmbient">Komplikationen während Ambient</string>
+    <string name="empty_complications">Zeige Komplikationen ohne Daten</string>
 </resources>
